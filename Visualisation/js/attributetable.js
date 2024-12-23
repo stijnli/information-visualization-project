@@ -12,21 +12,97 @@ const testdata = [{"album": {"album_type": "single","artists": [{"external_urls"
 
 console.log("Length of the testdataset", testdata.length);
 // inputs is the variable where to test the different legths of the dataset 
-let inputs = 4;
+let inputs = 10;
 let data = testdata.slice(0, inputs);
 console.log("number of songs to present in the table:", data.length)
+
+
+function dataPrepTable(data){
+    let tempRows = [];
+    let tempCols = [];
+    for (let i = 0; i < data.length; i++) {
+        tempCols = [data[i].id, 
+                    data[i].name,
+                    data[i].danceability,
+                    data[i].energy,
+                    data[i].acousticness,
+                    data[i].speechiness,
+                    data[i].liveness,
+                    data[i].tempo,
+                    data[i].valence,
+                    data[i].loudness];
+        tempRows.push(tempCols);
+        console.log(tempRows[i]);        
+    }
+    return tempRows;
+}
+
+let tableData =  dataPrepTable(data);
+
 // to cange the number of song attributes that are presented in the table
-let atributes = [{id: "danceability", attribute: "Danceability", description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
-     {id: "energy", attribute: "Energy", description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
-     {id:"acousticness", attribute: "Acousticness", description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
-     {id: "speechiness", attribute: "Speechiness", description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
-     {id: "liveness", attribute: "Liveness", description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
-     {id: "tempo", attribute: "Tempo", description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
-     {id: "valence", attribute: "Valence", description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
-     {id: "loudness", attribute: "Loudness", description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
+
+// definition of the luminance scales
+let colorScaleDanceability = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.danceability}), 
+    d3.max(data, function(d) {
+        return d.danceability})])
+.range([0, 1]);
+let colorScaleEnergy = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.energy}), 
+    d3.max(data, function(d) {
+        return d.energy})])
+.range([0, 1]);
+let colorScaleAcousticness = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.acousticness}), 
+    d3.max(data, function(d) {
+        return d.acousticness})])
+.range([0, 1]);
+let colorScaleSpeechiness = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.speechiness}), 
+    d3.max(data, function(d) {
+        return d.speechiness})])
+.range([0, 1]);
+let colorScaleLiveness = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.liveness}), 
+    d3.max(data, function(d) {
+        return d.liveness})])
+.range([0, 1]);
+let colorScaleTempo = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.tempo}), 
+    d3.max(data, function(d) {
+        return d.tempo})])
+.range([0, 1]);
+let colorScaleValence = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.valence}), 
+    d3.max(data, function(d) {
+        return d.valence})])
+.range([0, 1]);
+let colorScaleLoudness = d3.scaleLinear()
+.domain([d3.min(data, function(d) {
+    return d.loudness}), 
+    d3.max(data, function(d) {
+        return d.loudness})])
+.range([0, 1]);
+
+let atributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
+     {id: "energy", attribute: "Energy", scale: colorScaleEnergy, description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
+     {id:"acousticness", attribute: "Acousticness", scale: colorScaleAcousticness, description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
+     {id: "speechiness", attribute: "Speechiness", scale: colorScaleSpeechiness, description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
+     {id: "liveness", attribute: "Liveness", scale: colorScaleLiveness, description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
+     {id: "tempo", attribute: "Tempo", scale: colorScaleTempo, description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
+     {id: "valence", attribute: "Valence", scale: colorScaleValence, description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
+     {id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
 
 
 
+console.log(atributes[4].scale(0.9))
 
 
 // Margin object with properties for the four directions
@@ -86,12 +162,11 @@ for (let i = 0; i < atributes.length; i++) {
     };
 
 // making the tble grid and append the values to the table
-
-for (let i = 0 ; i < data.length; i++){
-    svgTable.append("g")
-        .attr("id", data[i].id)
-        .append("rect")
+ 
+for (let i = 0 ; i < tableData.length; i++){
+    svgTable.append("rect")
             .attr("class", "songInTable")
+            .attr("id", "Row." + i )
             .attr("x", 0)
             .attr("y", heightElement + heightElement *i)
             .attr("width", widthSong)
@@ -101,19 +176,20 @@ for (let i = 0 ; i < data.length; i++){
             .attr("stroke", "black")
     svgTable.append("text")
             .style("text-anchor", "middle")
-            .text(data[i].name)
+            .text(tableData[i][1])
 	        .attr("x", widthSong/2)
 	        .attr("y", heightElement + heightElement *i + heightElement/2)
             .attr("dominant-baseline", "central");
     for (let j = 0; j < atributes.length; j++){
     svgTable.append("rect")
-        .attr("id", data[i]+ atributes[j].id)    
+        .attr("id", "Row." + i + "." + atributes[j].id)    
         .attr("x", widthSong + ((width - widthSong)/atributes.length) * j )
         .attr("y", heightElement + heightElement *i)
         .attr("width", ((width - widthSong)/atributes.length))
         .attr("height", heightElement)
-        .attr("fill", "none")
+        .attr("fill", "blue")
         .attr("stroke-width", 2)
+        .attr("fill-opacity", atributes[j].scale(tableData[i][j+2]))
         .attr("stroke", "black");
     }
 }
