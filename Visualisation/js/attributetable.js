@@ -12,28 +12,35 @@ const testdata = [{"album": {"album_type": "single","artists": [{"external_urls"
 
 console.log("Length of the testdataset", testdata.length);
 // inputs is the variable where to test the different legths of the dataset 
-let inputs = 1;
+let inputs = 4;
 let data = testdata.slice(0, inputs);
 console.log("number of songs to present in the table:", data.length)
 // to cange the number of song attributes that are presented in the table
-let numberOfAttributes = 3
+let atributes = [{id: "danceability", attribute: "Danceability", description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
+     {id: "energy", attribute: "Energy", description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
+     {id:"acousticness", attribute: "Acousticness", description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
+     {id: "speechiness", attribute: "Speechiness", description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
+     {id: "liveness", attribute: "Liveness", description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
+     {id: "tempo", attribute: "Tempo", description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
+     {id: "valence", attribute: "Valence", description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
+     {id: "loudness", attribute: "Loudness", description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
 
 
 
 
 
 // Margin object with properties for the four directions
-let margin = {top: 20,
-             right: 10, 
-             bottom: 20, 
-             left: 75};
+let margin = {top: 5,
+             right: 5, 
+             bottom: 5, 
+             left: 5};
 
 // Width and height as the inner dimensions of the chart area
-let width = 900 - margin.left - margin.right;
-let height = 500 - margin.top - margin.bottom;
+let width = 720 - margin.left - margin.right;
+let height = 450 - margin.top - margin.bottom;
 
-let widthSong = 100
-let heightElement = 50 
+let widthSong = 150
+let heightElement = height/11 
 
 let svgTable = d3.select("#atrributeTable").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -41,28 +48,72 @@ let svgTable = d3.select("#atrributeTable").append("svg")
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 // appending the headline of the Table
+// 
 svgTable.append("rect")
     .attr("x", 0)
     .attr("y", 0)
-    .attr("width", 100)
-    .attr("height", 50)
-    .attr("fill", "blue")
+    .attr("width", widthSong)
+    .attr("height", heightElement)
+    .attr("fill", "none")
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
 svgTable.append("text")
     .style("text-anchor", "middle")
     .text("Song")
 	.attr("class", "tableHeadline")
     .attr("id", "songnameHeadline")
 	.attr("x", widthSong/2)
-	.attr("y", heightElement/2);
+	.attr("y", heightElement/2)
+    .attr("dominant-baseline", "central");
 
-test = 0;
-    for (let i = 0; i < numberOfAttributes+1; i++) {
-        test = i
-        console.log(test);
-        svgTable.append("rect")
-            .attr("x", widthSong + ((width - widthSong)/numberOfAttributes) * i )
-            .attr("y", 0)
-            .attr("width", ((width - widthSong)/numberOfAttributes))
+for (let i = 0; i < atributes.length; i++) {
+    svgTable.append("rect")
+        .attr("id", atributes[i].id + "Headline")    
+        .attr("x", widthSong + ((width - widthSong)/atributes.length) * i )
+        .attr("y", 0)
+        .attr("width", ((width - widthSong)/atributes.length))
+        .attr("height", heightElement)
+        .attr("fill", "none")
+        .attr("stroke-width", 2)
+        .attr("stroke", "black");
+    svgTable.append("text")
+        .style("text-anchor", "middle")
+        .text(atributes[i].attribute)
+        .attr("class", "tableHeadline")
+        .attr("x", widthSong + ((width - widthSong)/atributes.length) * i + ((width - widthSong)/atributes.length)/2)
+        .attr("y", heightElement/2)
+        .attr("dominant-baseline", "central");
+    };
+
+// making the tble grid and append the values to the table
+
+for (let i = 0 ; i < data.length; i++){
+    svgTable.append("g")
+        .attr("id", data[i].id)
+        .append("rect")
+            .attr("class", "songInTable")
+            .attr("x", 0)
+            .attr("y", heightElement + heightElement *i)
+            .attr("width", widthSong)
             .attr("height", heightElement)
-            .attr("fill", "blue");   
-    };           
+            .attr("fill", "none")
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+    svgTable.append("text")
+            .style("text-anchor", "middle")
+            .text(data[i].name)
+	        .attr("x", widthSong/2)
+	        .attr("y", heightElement + heightElement *i + heightElement/2)
+            .attr("dominant-baseline", "central");
+    for (let j = 0; j < atributes.length; j++){
+    svgTable.append("rect")
+        .attr("id", data[i]+ atributes[j].id)    
+        .attr("x", widthSong + ((width - widthSong)/atributes.length) * j )
+        .attr("y", heightElement + heightElement *i)
+        .attr("width", ((width - widthSong)/atributes.length))
+        .attr("height", heightElement)
+        .attr("fill", "none")
+        .attr("stroke-width", 2)
+        .attr("stroke", "black");
+    }
+}
