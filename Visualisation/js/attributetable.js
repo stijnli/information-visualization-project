@@ -11,17 +11,18 @@ const testdata = [{"album": {"album_type": "single","artists": [{"external_urls"
 {"album": {"album_type": "album", "artists": [{"external_urls": {"spotify": "https://open.spotify.com/artist/2YZyLoL8N0Wb9xBt1NhZWg"}, "href": "https://api.spotify.com/v1/artists/2YZyLoL8N0Wb9xBt1NhZWg", "id": "2YZyLoL8N0Wb9xBt1NhZWg", "name": "Kendrick Lamar", "type": "artist", "uri": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg"}], "available_markets": ["AR", "AU", "AT", "BE", "BO", "BR", "BG", "CA", "CL", "CO", "CR", "CY", "CZ", "DK", "DO", "DE", "EC", "EE", "SV", "FI", "FR", "GR", "GT", "HN", "HK", "HU", "IS", "IE", "IT", "LV", "LT", "LU", "MY", "MT", "MX", "NL", "NZ", "NI", "NO", "PA", "PY", "PE", "PH", "PL", "PT", "SG", "SK", "ES", "SE", "CH", "TW", "TR", "UY", "US", "GB", "AD", "LI", "MC", "ID", "JP", "TH", "VN", "RO", "IL", "ZA", "SA", "AE", "BH", "QA", "OM", "KW", "EG", "MA", "DZ", "TN", "LB", "JO", "PS", "IN", "KZ", "MD", "UA", "AL", "BA", "HR", "ME", "MK", "RS", "SI", "KR", "BD", "PK", "LK", "GH", "KE", "NG", "TZ", "UG", "AG", "AM", "BS", "BB", "BZ", "BT", "BW", "BF", "CV", "CW", "DM", "FJ", "GM", "GE", "GD", "GW", "GY", "HT", "JM", "KI", "LS", "LR", "MW", "MV", "ML", "MH", "FM", "NA", "NR", "NE", "PW", "PG", "WS", "SM", "ST", "SN", "SC", "SL", "SB", "KN", "LC", "VC", "SR", "TL", "TO", "TT", "TV", "VU", "AZ", "BN", "BI", "KH", "CM", "TD", "KM", "GQ", "SZ", "GA", "GN", "KG", "LA", "MO", "MR", "MN", "NP", "RW", "TG", "UZ", "ZW", "BJ", "MG", "MU", "MZ", "AO", "CI", "DJ", "ZM", "CD", "CG", "IQ", "LY", "TJ", "VE", "ET", "XK"], "external_urls": {"spotify": "https://open.spotify.com/album/0hvT3yIEysuuvkK73vgdcW"}, "href": "https://api.spotify.com/v1/albums/0hvT3yIEysuuvkK73vgdcW", "id": "0hvT3yIEysuuvkK73vgdcW", "images": [{"url": "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58", "width": 640, "height": 640}, {"url": "https://i.scdn.co/image/ab67616d00001e02d9985092cd88bffd97653b58", "width": 300, "height": 300}, {"url": "https://i.scdn.co/image/ab67616d00004851d9985092cd88bffd97653b58", "width": 64, "height": 64}], "name": "GNX", "release_date": "2024-11-22", "release_date_precision": "day", "total_tracks": 12, "type": "album", "uri": "spotify:album:0hvT3yIEysuuvkK73vgdcW"}, "artists": [{"external_urls": {"spotify": "https://open.spotify.com/artist/2YZyLoL8N0Wb9xBt1NhZWg"}, "href": "https://api.spotify.com/v1/artists/2YZyLoL8N0Wb9xBt1NhZWg", "id": "2YZyLoL8N0Wb9xBt1NhZWg", "name": "Kendrick Lamar", "type": "artist", "uri": "spotify:artist:2YZyLoL8N0Wb9xBt1NhZWg"}], "available_markets": ["AR", "AU", "AT", "BE", "BO", "BR", "BG", "CA", "CL", "CO", "CR", "CY", "CZ", "DK", "DO", "DE", "EC", "EE", "SV", "FI", "FR", "GR", "GT", "HN", "HK", "HU", "IS", "IE", "IT", "LV", "LT", "LU", "MY", "MT", "MX", "NL", "NZ", "NI", "NO", "PA", "PY", "PE", "PH", "PL", "PT", "SG", "SK", "ES", "SE", "CH", "TW", "TR", "UY", "US", "GB", "AD", "LI", "MC", "ID", "JP", "TH", "VN", "RO", "IL", "ZA", "SA", "AE", "BH", "QA", "OM", "KW", "EG", "MA", "DZ", "TN", "LB", "JO", "PS", "IN", "KZ", "MD", "UA", "AL", "BA", "HR", "ME", "MK", "RS", "SI", "KR", "BD", "PK", "LK", "GH", "KE", "NG", "TZ", "UG", "AG", "AM", "BS", "BB", "BZ", "BT", "BW", "BF", "CV", "CW", "DM", "FJ", "GM", "GE", "GD", "GW", "GY", "HT", "JM", "KI", "LS", "LR", "MW", "MV", "ML", "MH", "FM", "NA", "NR", "NE", "PW", "PG", "WS", "SM", "ST", "SN", "SC", "SL", "SB", "KN", "LC", "VC", "SR", "TL", "TO", "TT", "TV", "VU", "AZ", "BN", "BI", "KH", "CM", "TD", "KM", "GQ", "SZ", "GA", "GN", "KG", "LA", "MO", "MR", "MN", "NP", "RW", "TG", "UZ", "ZW", "BJ", "MG", "MU", "MZ", "AO", "CI", "DJ", "ZM", "CD", "CG", "IQ", "LY", "TJ", "VE", "ET", "XK"], "disc_number": 1, "duration_ms": 317092, "explicit": true, "external_ids": {"isrc": "USUG12408495"}, "external_urls": {"spotify": "https://open.spotify.com/track/5gOfC9UzZQzTyShqPMrpjT"}, "href": "https://api.spotify.com/v1/tracks/5gOfC9UzZQzTyShqPMrpjT", "id": "5gOfC9UzZQzTyShqPMrpjT", "is_local": false, "name": "wacced out murals", "popularity": 88, "preview_url": null, "track_number": 1, "type": "track", "uri": "spotify:track:5gOfC9UzZQzTyShqPMrpjT", "danceability": 0.761, "energy": 0.501, "key": 9, "loudness": -10.759, "mode": 0, "speechiness": 0.459, "acousticness": 0.249, "instrumentalness": 0.0, "liveness": 0.136, "valence": 0.502, "tempo": 81.998, "time_signature": 4}];
 
 console.log("Length of the testdataset", testdata.length);
-// inputs is the variable where to test the different legths of the dataset 
-let inputs = 10;
+// inputs is the variable where to test the different legths of the dataset
+
+let inputs = 5;
 let data = testdata.slice(0, inputs);
 console.log("number of songs to present in the table:", data.length)
-
-
-function dataPrepTable(data){
-    let tempRows = [];
-    let tempCols = [];
+/// --- prepDataTable takes the raw data and prepares in an array; 
+// the index of each element in tempRow is used in the objects of "attributes" as "arrayIndex" 
+function prepDataTable(data){
+    let Rows = [];
+    let tempRow = [];
     for (let i = 0; i < data.length; i++) {
-        tempCols = [data[i].id, 
+        tempRow = [data[i].id, 
                     data[i].name,
                     data[i].danceability,
                     data[i].energy,
@@ -31,17 +32,17 @@ function dataPrepTable(data){
                     data[i].tempo,
                     data[i].valence,
                     data[i].loudness];
-        tempRows.push(tempCols);
-        console.log(tempRows[i]);        
+        Rows.push(tempRow);
+        console.log(Rows[i]);        
     }
-    return tempRows;
+    return Rows;
 }
 
-let tableData =  dataPrepTable(data);
+let tableData =  prepDataTable(data);
 
-// to cange the number of song attributes that are presented in the table
 
-// definition of the luminance scales
+
+// Definition of the luminance scales which are then stored in "attributes" as "scale"
 let colorScaleDanceability = d3.scaleLinear()
 .domain([d3.min(data, function(d) {
     return d.danceability}), 
@@ -91,18 +92,14 @@ let colorScaleLoudness = d3.scaleLinear()
         return d.loudness})])
 .range([0, 1]);
 
-let atributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
-     {id: "energy", attribute: "Energy", scale: colorScaleEnergy, description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
-     {id:"acousticness", attribute: "Acousticness", scale: colorScaleAcousticness, description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
-     {id: "speechiness", attribute: "Speechiness", scale: colorScaleSpeechiness, description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
-     {id: "liveness", attribute: "Liveness", scale: colorScaleLiveness, description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
-     {id: "tempo", attribute: "Tempo", scale: colorScaleTempo, description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
-     {id: "valence", attribute: "Valence", scale: colorScaleValence, description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
-     {id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
-
-
-
-console.log(atributes[4].scale(0.9))
+let attributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, arrayIndex: 2, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
+     {id: "energy", attribute: "Energy", scale: colorScaleEnergy, arrayIndex: 3, description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
+     {id:"acousticness", attribute: "Acousticness", scale: colorScaleAcousticness, arrayIndex: 4, description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
+     {id: "speechiness", attribute: "Speechiness", scale: colorScaleSpeechiness, arrayIndex: 5, description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
+     {id: "liveness", attribute: "Liveness", scale: colorScaleLiveness, arrayIndex: 6, description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
+     {id: "tempo", attribute: "Tempo", scale: colorScaleTempo, arrayIndex: 7, description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
+     {id: "valence", attribute: "Valence", scale: colorScaleValence, arrayIndex: 8,description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
+     {id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, arrayIndex: 9, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
 
 
 // Margin object with properties for the four directions
@@ -142,21 +139,21 @@ svgTable.append("text")
 	.attr("y", heightElement/2)
     .attr("dominant-baseline", "central");
 
-for (let i = 0; i < atributes.length; i++) {
+for (let i = 0; i < attributes.length; i++) {
     svgTable.append("rect")
-        .attr("id", atributes[i].id + "Headline")    
-        .attr("x", widthSong + ((width - widthSong)/atributes.length) * i )
+        .attr("id", attributes[i].id + "Headline")    
+        .attr("x", widthSong + ((width - widthSong)/attributes.length) * i )
         .attr("y", 0)
-        .attr("width", ((width - widthSong)/atributes.length))
+        .attr("width", ((width - widthSong)/attributes.length))
         .attr("height", heightElement)
         .attr("fill", "none")
         .attr("stroke-width", 2)
         .attr("stroke", "black");
     svgTable.append("text")
         .style("text-anchor", "middle")
-        .text(atributes[i].attribute)
+        .text(attributes[i].attribute)
         .attr("class", "tableHeadline")
-        .attr("x", widthSong + ((width - widthSong)/atributes.length) * i + ((width - widthSong)/atributes.length)/2)
+        .attr("x", widthSong + ((width - widthSong)/attributes.length) * i + ((width - widthSong)/attributes.length)/2)
         .attr("y", heightElement/2)
         .attr("dominant-baseline", "central");
     };
@@ -180,16 +177,16 @@ for (let i = 0 ; i < tableData.length; i++){
 	        .attr("x", widthSong/2)
 	        .attr("y", heightElement + heightElement *i + heightElement/2)
             .attr("dominant-baseline", "central");
-    for (let j = 0; j < atributes.length; j++){
+    for (let j = 0; j < attributes.length; j++){
     svgTable.append("rect")
-        .attr("id", "Row." + i + "." + atributes[j].id)    
-        .attr("x", widthSong + ((width - widthSong)/atributes.length) * j )
+        .attr("id", "Row." + i + "." + attributes[j].id)    
+        .attr("x", widthSong + ((width - widthSong)/attributes.length) * j )
         .attr("y", heightElement + heightElement *i)
-        .attr("width", ((width - widthSong)/atributes.length))
+        .attr("width", ((width - widthSong)/attributes.length))
         .attr("height", heightElement)
         .attr("fill", "blue")
         .attr("stroke-width", 2)
-        .attr("fill-opacity", atributes[j].scale(tableData[i][j+2]))
+        .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
         .attr("stroke", "black");
     }
 }
