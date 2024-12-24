@@ -23,15 +23,37 @@ const setSelectedSongs = (newSelectedSongs) => {
 };
 
 let currentHoveredSongId = undefined;
+let oldHoveredSongOutlineColor = undefined;
 const setCurrentHoveredSongId = (newSongId) => {
-
+    const oldSongIsSelected = selectedSongs.some(song => song.id === currentHoveredSongId);
     // Update the border of the song image
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
+        if(oldSongIsSelected) {
         document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
+        }
+
+        // Change svg node stroke
+        document.getElementById("graphNode-" + currentHoveredSongId).style.stroke = oldHoveredSongOutlineColor
+    }
+
+    if (newSongId === undefined) {
+        return;
+    }
+
+    const songIsSelected = selectedSongs.some(song => song.id === newSongId);
+
+    if (!songIsSelected) {
+        return;
     }
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
+        
+        // Change svg node stroke
+        graphNode = document.getElementById("graphNode-" + newSongId)
+        oldHoveredSongOutlineColor = graphNode.style.stroke
+        graphNode.style.stroke = "black"
+
     }
 
     currentHoveredSongId = newSongId

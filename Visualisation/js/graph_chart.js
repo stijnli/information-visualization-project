@@ -8,7 +8,8 @@ const setOpenedNodes = (newOpenedNodes) => {
 // the graphChart is a network graph of the songs, artists, albums and genres. 
 const renderGraphChart = () => {
     const height = 400;
-    const width = 1000;
+    const width = 1200;
+    const legendWidth = 100; // Width for the legend
 
     const element = d3.select('#graphChart');
 
@@ -36,8 +37,10 @@ const renderGraphChart = () => {
     let svg = element.select('svg');
     if (svg.empty()) {
         element.html('');
+        // Make svg with border
         svg = element.append('svg')
-            .attr('width', width)
+            .style('border', '1px solid #000')
+            .attr('width', width + legendWidth) // Adjust width to accommodate legend
             .attr('height', height);
     }
 
@@ -54,11 +57,11 @@ const renderGraphChart = () => {
     svg.call(zoom);
 
     const simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(-100))
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("x", d3.forceX(width / 2).strength(0.1))
-        .force("y", d3.forceY(height / 2).strength(0.1));
+        .force("link", d3.forceLink().id(d => d.id).strength(0.5)) // Reduce link strength
+        .force("charge", d3.forceManyBody().strength(-100)) // Reduce charge strength
+        .force("center", d3.forceCenter(width / 2, height / 2).strength(0.5))
+        .force("x", d3.forceX(width / 2).strength(0.05)) // Reduce x force strength
+        .force("y", d3.forceY(height / 2).strength(0.05)); // Reduce y force strength
 
     const artistIdToArtist = new Map(artists.map(artist => [artist.id, artist]));
 
@@ -103,45 +106,75 @@ const renderGraphChart = () => {
         }
     });
 
-    nodes = [...new Map(nodes.map(node => [node.id, node])).values()];
+    // Only keep the first occurance of each node 
+    nodes = nodes.filter((node, index, self) =>
+        index === self.findIndex(t => (
+            t.id === node.id && t.type === node.type
+        ))
+    );
 
     const links = [];
-    openedNodes.forEach(node => {
+    nodes.forEach(node => {
         if (node.type === 'song') {
             const song = songs.find(song => song.id === node.id);
-            const albumOpen = openedNodes.some(node => node.id === song.album.id);
+            const albumInNodes = nodes.some(node => node.id === song.album.id);
+            const albumOpened = openedNodes.some(node => node.id === song.album.id);
+            const songOpened = openedNodes.some(node => node.id === song.id);
+
+            if (albumInNodes && (albumOpened || songOpened)) {
+                links.push({ source: node.id, target: song.album.id });
+            }
+
             song.artists.forEach(artist => {
+                const artistInNodes = nodes.some(node => node.id === artist.id);
                 const artistInAlbum = song.album.artists.some(albumArtist => albumArtist.id === artist.id);
-                if (!albumOpen || !artistInAlbum) {
+
+                const artistOpened = openedNodes.some(node => node.id === artist.id);
+
+                if (!artistInNodes || (!artistOpened && !songOpened)) {
+                    return
+                }
+                if (!albumInNodes || !albumOpened || !artistInAlbum) {
                     links.push({ source: node.id, target: artist.id });
-                } else if (albumOpen && artistInAlbum) {
+                }
+                else if (albumInNodes && artistInAlbum) {
                     links.push({ source: node.id, target: song.album.id });
                 }
             });
-            links.push({ source: node.id, target: song.album.id });
+
         } else if (node.type === 'artist') {
             const artist = artistIdToArtist.get(node.id);
+            const artistOpened = openedNodes.some(node => node.id === artist.id);
+
             artist.albums.forEach(album => {
-                links.push({ source: node.id, target: album.id });
+                const albumOpened = openedNodes.some(node => node.id === album.id);
+                if (albumOpened || artistOpened) {
+                    links.push({ source: node.id, target: album.id });
+                }
             });
+
             artist.genres.forEach(genre => {
-                links.push({ source: node.id, target: genre });
+                // const genreInNodes = nodes.some(node => node.id === genre);
+                const genreOpened = openedNodes.some(node => node.id === genre);
+                if (genreOpened || artistOpened) {
+                    links.push({ source: node.id, target: genre });
+                }
             });
         } else if (node.type === 'album') {
             const album = albums.find(album => album.id === node.id);
-            album.artists.forEach(artist => {
-                links.push({ source: node.id, target: artist.id });
-            });
-            album.songs.forEach(song => {
-                links.push({ source: node.id, target: song.id });
-            });
+            // album.artists.forEach(artist => {
+            //     links.push({ source: node.id, target: artist.id });
+            // });
+            // album.songs.forEach(song => {
+            //     links.push({ source: node.id, target: song.id });
+            // });
         } else if (node.type === 'genre') {
-            const genre = node.id;
-            artists.forEach(artist => {
-                if (artist.genres.includes(genre)) {
-                    links.push({ source: node.id, target: artist.id });
-                }
-            });
+            // const genre = node.id;
+            // artists.forEach(artist => {
+            //     if (artist.genres.includes(genre)) {
+            //         links.push({ source: node.id, target: artist.id });
+            //     }
+            // });
         }
     });
 
@@ -151,10 +184,25 @@ const renderGraphChart = () => {
 
         let localNode = node.data(data.nodes);
         localNode.exit().remove();
-        localNode = localNode.enter().append("circle")
-            .attr("r", 8)
+        localNode = localNode.enter().append("path")
+            .attr("d", d => {
+                const nodeOpen = openedNodes.some(node => node.id === d.id);
+                const nodeSize = nodeOpen ? 500 : 200;
+
+                if (d.type === 'song') {
+                    return d3.symbol().type(d3.symbolCircle).size(nodeSize)();
+                } else if (d.type === 'album') {
+                    return d3.symbol().type(d3.symbolSquare).size(nodeSize)();
+                } else if (d.type === 'artist') {
+                    return d3.symbol().type(d3.symbolStar).size(nodeSize)();
+                } else if (d.type === 'genre') {
+                    return d3.symbol().type(d3.symbolTriangle).size(nodeSize)();
+                }
+            })
+            .attr("id", d => "graphNode-" + d.id)
             .attr("fill", d => d.color || 'black')
-            .attr("stroke", d => d.edge || "white")
+            .attr("stroke", d => openedNodes.some(node => node.id === d.id) ? '#cccccc' : (d.edge || "white")) // Add green border for opened nodes
+            .attr("stroke-width", 2)
             .on("click", (event, d) => {
                 event.stopPropagation();
                 if (openedNodes.some(node => node.id === d.id)) {
@@ -163,6 +211,38 @@ const renderGraphChart = () => {
                     setOpenedNodes([...openedNodes, d]);
                 }
             })
+            .on("contextmenu", (event, d) => {
+                event.preventDefault();
+                if (d.type === 'song') {
+                    const selectedSong = selectedSongs.find(song => song.id === d.id);
+                    if (selectedSong) {
+                        setSelectedSongs(selectedSongs.filter(song => song.id !== d.id));
+                    } else {
+                        setSelectedSongs([...selectedSongs, songs.find(song => song.id === d.id)]);
+                    }
+
+                }
+            })
+
+            .on("mouseover", (event, d) => {
+                // Set setCurrentHoveredSongId
+
+                if (d.type === 'song') {
+                    setCurrentHoveredSongId(d.id);
+                }
+
+                // Set cursor to pointer
+                d3.select(event.target).style("cursor", "pointer");
+            }
+            )
+            .on("mouseout", (event, d) => {
+                // Set setCurrentHoveredSongId
+                setCurrentHoveredSongId(undefined);
+
+                // Set cursor to default
+                d3.select(event.target).style("cursor", "default");
+            }
+            )
             .merge(localNode);
 
         localNode.append("title")
@@ -178,10 +258,15 @@ const renderGraphChart = () => {
             g.selectAll("circle")
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+
+            g.selectAll("path")
+                .attr("transform", d => `translate(${d.x},${d.y})`);
         }
 
         simulation.nodes(data.nodes)
-            .on("tick", ticked);
+            .on("tick", ticked)
+            .alpha(0.5) // Start with a lower alpha value to reduce initial movement
+            .restart();
 
         let localLink = link.data(data.links);
         localLink.exit().remove();
@@ -197,4 +282,32 @@ const renderGraphChart = () => {
     }
 
     update({ nodes, links });
+
+    // Add legend
+    const legend = svg.append('g')
+        .attr('transform', `translate(${width + 20}, 20)`); // Position legend on the right side
+
+    const legendData = [
+        { type: 'song', shape: d3.symbolCircle, label: 'Song' },
+        { type: 'album', shape: d3.symbolSquare, label: 'Album' },
+        { type: 'artist', shape: d3.symbolStar, label: 'Artist' },
+        { type: 'genre', shape: d3.symbolTriangle, label: 'Genre' }
+    ];
+
+    legend.selectAll('path')
+        .data(legendData)
+        .enter()
+        .append('path')
+        .attr('d', d => d3.symbol().type(d.shape).size(200)())
+        .attr('transform', (d, i) => `translate(10, ${i * 30})`)
+        .attr('fill', 'black');
+
+    legend.selectAll('text')
+        .data(legendData)
+        .enter()
+        .append('text')
+        .attr('x', 30)
+        .attr('y', (d, i) => i * 30 + 5)
+        .text(d => d.label)
+        .attr('alignment-baseline', 'middle');
 }
