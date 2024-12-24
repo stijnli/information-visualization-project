@@ -61,9 +61,6 @@ const renderMusicSelection = () => {
 
 }
 
-renderMusicSelection();
-
-
 // Define render functions
 const renderSearchResults = () => {
 

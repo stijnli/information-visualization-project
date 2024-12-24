@@ -19,6 +19,7 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
+    renderGraphChart();
 };
 
 let currentHoveredSongId = undefined;
@@ -49,6 +50,17 @@ const setSongs = (songsData) => {
     songs = songsData;
 };
 
+let artists = [];
+const setArtists = (artistsData) => {
+    artists = artistsData;
+};
+
+let albums = [];
+const setAlbums = (albumsData) => {
+    albums = albumsData;
+};
+
+
 // Define some commonly used state-mutation functions (functions that use the setter functions to change the state)
 const removeSong = (songId) => {
     // Remove the song from the selection
@@ -66,18 +78,62 @@ const addSong = (songId) => {
     setSelectedSongs([...selectedSongs, newSong]);
 };
 
-// Define data loading, try not to load the data multiple times.
-fetch('data/songs.json')
-    .then(response => response.json())
-    .then(songs => {
-        setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 10));
-        setSongs(songs);
-
-    })
-    .catch(error => console.error('Error loading songs:', error));
-
-renderMusicSelection();
 
 
+const initializeLoad = () => {
+    // Define data loading, try not to load the data multiple times.
+    fetch('data/songs.json')
+        .then(response => response.json())
+        .then(songs => {
+            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 2));
+            setSongs(songs);
+
+            let albumsMap = new Map();
+            songs.forEach(song => {
+                if (!albumsMap.has(song.album.id)) {
+                    albumsMap.set(song.album.id, song.album);
+                }
+                albumsMap.get(song.album.id).songs = albumsMap.get(song.album.id).songs || new Set();
+                albumsMap.get(song.album.id).songs.add(song);
+            });
+            albums = [...albumsMap.values()];
+
+        }).then(() => {
+            fetch('data/artists.json')
+                .then(response => response.json())
+                .then(artists => {
+                    songsPerArtist = new Map();
+                    albumsPerArtist = new Map();
+                    songs.forEach(song => {
+                        song.artists.forEach(artist => {
+                            if (!songsPerArtist.has(artist.id)) {
+                                songsPerArtist.set(artist.id, new Set());
+                            }
+                            songsPerArtist.get(artist.id).add(song);
+                        });
+
+                        song.album.artists.forEach(artist => {
+                            if (!albumsPerArtist.has(artist.id)) {
+                                albumsPerArtist.set(artist.id, new Set());
+                            }
+                            albumsPerArtist.get(artist.id).add(song.album);
+                        });
+
+
+                    });
+                    artists.forEach(artist => {
+                        artist.songs = [...songsPerArtist.get(artist.id) || new Set()];
+                        artist.albums = [...albumsPerArtist.get(artist.id) || new Set()];
+                    });
+                    setArtists(artists);
+                });
+        })
+        .catch(error => console.error('Error loading data:', error));
+
+
+
+    renderMusicSelection();
+    renderGraphChart();
+};
 
 
