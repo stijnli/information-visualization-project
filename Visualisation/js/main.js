@@ -107,7 +107,7 @@ const initializeLoad = () => {
     fetch('data/songs.json')
         .then(response => response.json())
         .then(songs => {
-            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 2));
+            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
             setSongs(songs);
 
             let albumsMap = new Map();
