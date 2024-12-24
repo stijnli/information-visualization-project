@@ -54,6 +54,10 @@ const renderGraphChart = () => {
             g.attr('transform', event.transform);
         });
 
+    // Preserve the zoom state
+    const zoomState = svg.property("__zoom") || d3.zoomIdentity;
+    svg.call(zoom).call(zoom.transform, zoomState);
+
     svg.call(zoom);
 
     const simulation = d3.forceSimulation()
@@ -69,6 +73,7 @@ const renderGraphChart = () => {
     selectedSongs.forEach(song => {
         nodes.push({ id: song.id, type: 'song', name: song.name, color: song.color });
     });
+
     // For each node in the opened nodes, add the node and the surrounding nodes
     openedNodes.forEach(node => {
         nodes.push(node);
@@ -113,7 +118,7 @@ const renderGraphChart = () => {
         ))
     );
 
-    const links = [];
+    let links = [];
     nodes.forEach(node => {
         if (node.type === 'song') {
             const song = songs.find(song => song.id === node.id);
@@ -134,9 +139,12 @@ const renderGraphChart = () => {
                 if (!artistInNodes || (!artistOpened && !songOpened)) {
                     return
                 }
-                if (!albumInNodes || !albumOpened || !artistInAlbum) {
+
+                // Show the artist-song link only if 1) album is not visible or 2) artist is not in the album (i.e. artist only contributed to the song) or 3) album or arist are not opened, as it would make a redundant link. 
+                if (!albumInNodes || !artistInAlbum || (!albumOpened && !artistOpened) ) {
                     links.push({ source: node.id, target: artist.id });
                 }
+                // Else make sure that there is a link between the song and the album, so that the artist will be related to the song through the album.
                 else if (albumInNodes && artistInAlbum) {
                     links.push({ source: node.id, target: song.album.id });
                 }
@@ -154,41 +162,44 @@ const renderGraphChart = () => {
             });
 
             artist.genres.forEach(genre => {
-                // const genreInNodes = nodes.some(node => node.id === genre);
                 const genreOpened = openedNodes.some(node => node.id === genre);
+
+                // Only connect genres to artists if the genre is opened or the artist is opened, otherways it would many links for artists and genres.
                 if (genreOpened || artistOpened) {
                     links.push({ source: node.id, target: genre });
                 }
             });
         } else if (node.type === 'album') {
-            const album = albums.find(album => album.id === node.id);
-            // album.artists.forEach(artist => {
-            //     links.push({ source: node.id, target: artist.id });
-            // });
-            // album.songs.forEach(song => {
-            //     links.push({ source: node.id, target: song.id });
-            // });
+            // Albums are already linked to songs and artists by the song links
         } else if (node.type === 'genre') {
-            // const genre = node.id;
-            // artists.forEach(artist => {
-            //     if (artist.genres.includes(genre)) {
-            //         links.push({ source: node.id, target: artist.id });
-            //     }
-            // });
+            // Genres are already linked to artists by the artist links.
         }
     });
 
+    // Remove duplicates links by 1) sorting the links so that the source is always smaller than the target and 2) only keeping the first occurance of each link
+    links.sort((a, b) => a.source - b.source || a.target - b.target);
+    links = links.filter((link, index, self) =>
+        index === self.findIndex(t => (
+            t.source === link.source && t.target === link.target
+        ))
+    );
+
+    // Update function that updates the graph with the new data, and handles the click events for the nodes
     const update = (data) => {
         let link = g.selectAll("line");
         let node = g.selectAll("circle");
-
+        
+        // Create nodes
         let localNode = node.data(data.nodes);
         localNode.exit().remove();
         localNode = localNode.enter().append("path")
             .attr("d", d => {
+                // Set node size and shape based on the type of the node
                 const nodeOpen = openedNodes.some(node => node.id === d.id);
+                // Set node size based on whether the node is opened or not
                 const nodeSize = nodeOpen ? 500 : 200;
-
+                
+                // Set node shape based on the type of the node
                 if (d.type === 'song') {
                     return d3.symbol().type(d3.symbolCircle).size(nodeSize)();
                 } else if (d.type === 'album') {
@@ -199,10 +210,15 @@ const renderGraphChart = () => {
                     return d3.symbol().type(d3.symbolTriangle).size(nodeSize)();
                 }
             })
+            // Set node id based on the node id, this is used so that the node appearance can be altered from code outside of the d3 code
             .attr("id", d => "graphNode-" + d.id)
+            // Give it a fill color based on the color of the song, or black if no color is set
             .attr("fill", d => d.color || 'black')
-            .attr("stroke", d => openedNodes.some(node => node.id === d.id) ? '#cccccc' : (d.edge || "white")) // Add green border for opened nodes
+            // Give it a border that is white (invisible) if the node is not opened, and grey if it is opened
+            .attr("stroke", d => openedNodes.some(node => node.id === d.id) ? '#cccccc' : (d.edge || "white")) 
             .attr("stroke-width", 2)
+
+            // Handle click on nodes to open or close them
             .on("click", (event, d) => {
                 event.stopPropagation();
                 if (openedNodes.some(node => node.id === d.id)) {
@@ -211,6 +227,8 @@ const renderGraphChart = () => {
                     setOpenedNodes([...openedNodes, d]);
                 }
             })
+
+            // Handle right click on nodes to add them to the selection
             .on("contextmenu", (event, d) => {
                 event.preventDefault();
                 if (d.type === 'song') {
@@ -224,6 +242,7 @@ const renderGraphChart = () => {
                 }
             })
 
+            // Handle mouseover and mouseout events to set the hovered song id, which highlights the song in the song list
             .on("mouseover", (event, d) => {
                 // Set setCurrentHoveredSongId
 
@@ -245,9 +264,11 @@ const renderGraphChart = () => {
             )
             .merge(localNode);
 
+        // Add title to the nodes, which appears when hovering over the node
         localNode.append("title")
             .text(d => (d.type.charAt(0).toUpperCase() + d.type.slice(1) + ': ' + d.name));
-
+        
+        // Create links, which are the lines between the nodes, these are mapped to the data.links
         const ticked = () => {
             g.selectAll("line")
                 .attr("x1", d => d.source.x)
@@ -266,7 +287,7 @@ const renderGraphChart = () => {
         simulation.nodes(data.nodes)
             .on("tick", ticked)
             .alpha(0.5) // Start with a lower alpha value to reduce initial movement
-            .restart();
+
 
         let localLink = link.data(data.links);
         localLink.exit().remove();
