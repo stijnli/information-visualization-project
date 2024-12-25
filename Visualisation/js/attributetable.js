@@ -42,8 +42,29 @@ function prepDataTable(data, config ){
     }
     return Rows;
 }
-function rowHighlight(){
-    
+
+// croping the song title to fit in the element
+function cropText(textElement, text, widthElement) {
+    // Append a temporary text element to the SVG to measure its length
+    const tempText = textElement.append("text")
+        .attr("visibility", "hidden")
+        .text(text);
+
+    let croppedText = text;
+    if (tempText.node().getComputedTextLength() < widthElement-2){
+        croppedText = text
+    }
+    else{
+        while (tempText.node().getComputedTextLength() > widthElement-5) {
+            croppedText = croppedText.slice(0, -4); // Remove one character at a time
+            tempText.text(croppedText + "...");
+        }
+        croppedText = croppedText + "..."
+    }
+    // Remove the temporary element after measuring
+    tempText.remove();
+
+    return croppedText;
 }
 
 let tableData =  prepDataTable(data, config);
@@ -100,7 +121,7 @@ let colorScaleLoudness = d3.scaleLinear()
         return d.loudness})])
 .range([0, 1]);
 
-let attributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, arrayIndex: 3, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
+const attributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, arrayIndex: 3, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
      {id: "energy", attribute: "Energy", scale: colorScaleEnergy, arrayIndex: 4, description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
      {id:"acousticness", attribute: "Acousticness", scale: colorScaleAcousticness, arrayIndex: 5, description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
      {id: "speechiness", attribute: "Speechiness", scale: colorScaleSpeechiness, arrayIndex: 6, description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
@@ -111,17 +132,17 @@ let attributes = [{id: "danceability", attribute: "Danceability", scale: colorSc
 
 
 // Margin object with properties for the four directions
-let margin = {top: 5,
+const margin = {top: 5,
              right: 5, 
              bottom: 5, 
              left: 5};
 
 // Width and height as the inner dimensions of the chart area
-let width = 720 - margin.left - margin.right;
+const width = 720 - margin.left - margin.right;
 let height = 450 - margin.top - margin.bottom;
 
-let widthSong = 150
-let heightElement = height/11 
+const widthSong = 150
+const heightElement = height/11 
 
 let svgTable = d3.select("#atrributeTable").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -178,10 +199,11 @@ for (let i = 0 ; i < tableData.length; i++){
         .attr("fill", "none");
     
     svgTable.append("text")
+        .attr("id", "song" + i + "inTable")
         .attr("x", 5)
 	    .attr("y", heightElement + heightElement *i + heightElement/4)
         .attr("dominant-baseline", "central")
-        .html(`<tspan class="card-title" dy="0">${tableData[i][1]}</tspan><br><tspan class="card-text" x="5" dy="1.2em">${tableData[i][2]}</tspan>`);
+        .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong)}</tspan><br><tspan class="card-text" x="5" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong)}</tspan>`);
     
     svgTable.append("rect")
         .attr("class", "songInTable Row" + i)
@@ -198,7 +220,7 @@ for (let i = 0 ; i < tableData.length; i++){
         })
         .on("mouseout", function() {
             // On mouse out, revert the outline color
-            d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // Revert back to black 
+            d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // Revert back to black
         });
     
     
@@ -210,7 +232,7 @@ for (let i = 0 ; i < tableData.length; i++){
         .attr("y", heightElement + heightElement *i)
         .attr("width", ((width - widthSong)/attributes.length))
         .attr("height", heightElement)
-        .attr("fill", "blue")
+        .attr("fill", "black")
         .attr("stroke-width", 2)
         .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
         .attr("stroke", "none")
