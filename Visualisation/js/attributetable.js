@@ -13,7 +13,7 @@ const testdata = [{"album": {"album_type": "single","artists": [{"external_urls"
 console.log("Length of the testdataset", testdata.length);
 // inputs is the variable where to test the different legths of the dataset
 
-let inputs = 5;
+let inputs = 7;
 let data = testdata.slice(0, inputs);
 console.log("number of songs to present in the table:", data.length)
 /// --- prepDataTable takes the raw data and prepares in an array; 
@@ -24,6 +24,7 @@ function prepDataTable(data){
     for (let i = 0; i < data.length; i++) {
         tempRow = [data[i].id, 
                     data[i].name,
+                    data[i].artists.map(artist => artist.name).join(', '),
                     data[i].danceability,
                     data[i].energy,
                     data[i].acousticness,
@@ -36,6 +37,9 @@ function prepDataTable(data){
         console.log(Rows[i]);        
     }
     return Rows;
+}
+function rowHighlight(){
+    
 }
 
 let tableData =  prepDataTable(data);
@@ -92,14 +96,14 @@ let colorScaleLoudness = d3.scaleLinear()
         return d.loudness})])
 .range([0, 1]);
 
-let attributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, arrayIndex: 2, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
-     {id: "energy", attribute: "Energy", scale: colorScaleEnergy, arrayIndex: 3, description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
-     {id:"acousticness", attribute: "Acousticness", scale: colorScaleAcousticness, arrayIndex: 4, description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
-     {id: "speechiness", attribute: "Speechiness", scale: colorScaleSpeechiness, arrayIndex: 5, description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
-     {id: "liveness", attribute: "Liveness", scale: colorScaleLiveness, arrayIndex: 6, description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
-     {id: "tempo", attribute: "Tempo", scale: colorScaleTempo, arrayIndex: 7, description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
-     {id: "valence", attribute: "Valence", scale: colorScaleValence, arrayIndex: 8,description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
-     {id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, arrayIndex: 9, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
+let attributes = [{id: "danceability", attribute: "Danceability", scale: colorScaleDanceability, arrayIndex: 3, description: "Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable."},
+     {id: "energy", attribute: "Energy", scale: colorScaleEnergy, arrayIndex: 4, description: "Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy."},
+     {id:"acousticness", attribute: "Acousticness", scale: colorScaleAcousticness, arrayIndex: 5, description: "A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic."},
+     {id: "speechiness", attribute: "Speechiness", scale: colorScaleSpeechiness, arrayIndex: 6, description: "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks."},
+     {id: "liveness", attribute: "Liveness", scale: colorScaleLiveness, arrayIndex: 7, description: "Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live."},
+     {id: "tempo", attribute: "Tempo", scale: colorScaleTempo, arrayIndex: 8, description: "The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration."},
+     {id: "valence", attribute: "Valence", scale: colorScaleValence, arrayIndex: 9,description: "A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)."},
+     {id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, arrayIndex: 10, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db."}]
 
 
 // Margin object with properties for the four directions
@@ -121,7 +125,6 @@ let svgTable = d3.select("#atrributeTable").append("svg")
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 // appending the headline of the Table
-// 
 svgTable.append("rect")
     .attr("x", 0)
     .attr("y", 0)
@@ -158,28 +161,47 @@ for (let i = 0; i < attributes.length; i++) {
         .attr("dominant-baseline", "central");
     };
 
-// making the tble grid and append the values to the table
+// making the table grid and append the values to the table
  
 for (let i = 0 ; i < tableData.length; i++){
+    // adding box for higlighting a row when on hover
     svgTable.append("rect")
-            .attr("class", "songInTable")
-            .attr("id", "Row." + i )
-            .attr("x", 0)
-            .attr("y", heightElement + heightElement *i)
-            .attr("width", widthSong)
-            .attr("height", heightElement)
-            .attr("fill", "none")
-            .attr("stroke-width", 2)
-            .attr("stroke", "black")
+        .attr("id", "Row" + i + "highlight")
+        .attr("x", 0)
+        .attr("y", heightElement + (heightElement * i))
+        .attr("width", width)
+        .attr("height", heightElement)
+        .attr("fill", "none");
+    
     svgTable.append("text")
-            .style("text-anchor", "middle")
-            .text(tableData[i][1])
-	        .attr("x", widthSong/2)
-	        .attr("y", heightElement + heightElement *i + heightElement/2)
-            .attr("dominant-baseline", "central");
-    for (let j = 0; j < attributes.length; j++){
+        .attr("x", 5)
+	    .attr("y", heightElement + heightElement *i + heightElement/4)
+        .attr("dominant-baseline", "central")
+        .html(`<tspan class="card-title" dy="0">${tableData[i][1]}</tspan><br><tspan class="card-text" x="5" dy="1.2em">${tableData[i][2]}</tspan>`);
+    
     svgTable.append("rect")
-        .attr("id", "Row." + i + "." + attributes[j].id)    
+        .attr("class", "songInTable Row" + i)
+        .attr("x", 0)
+        .attr("y", heightElement + heightElement *i)
+        .attr("width", widthSong)
+        .attr("height", heightElement)
+        .attr("fill-opacity", 0)
+        .attr("stroke-width", 2)
+        .attr("stroke", "black")
+        .on("mouseover", function() {
+            // On hover, change the outline to a different color
+            d3.select("#Row" + i + "highlight" ).attr("stroke", "red").attr("stroke-width", 4).style("visibility", "visible");
+        })
+        .on("mouseout", function() {
+            // On mouse out, revert the outline color
+            d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // Revert back to black 
+        });
+    
+    
+
+        for (let j = 0; j < attributes.length; j++){
+    svgTable.append("rect")
+        .attr("class", attributes[j].id + " Row" +i)    
         .attr("x", widthSong + ((width - widthSong)/attributes.length) * j )
         .attr("y", heightElement + heightElement *i)
         .attr("width", ((width - widthSong)/attributes.length))
@@ -187,6 +209,14 @@ for (let i = 0 ; i < tableData.length; i++){
         .attr("fill", "blue")
         .attr("stroke-width", 2)
         .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
-        .attr("stroke", "black");
+        .attr("stroke", "none")
+        .on("mouseover", function() {
+            // On hover, change the outline to a different color
+            d3.select("#Row" + i + "highlight" ).attr("stroke", "red").attr("stroke-width", 4).style("visibility", "visible");
+        })
+        .on("mouseout", function() {
+            // On mouse out, revert the outline color
+            d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // Revert back to black 
+        });
     }
 }
