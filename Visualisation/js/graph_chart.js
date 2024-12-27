@@ -76,7 +76,7 @@ const renderGraphChart = () => {
 
     // For each node in the opened nodes, add the node and the surrounding nodes
     openedNodes.forEach(node => {
-        nodes.push(node);
+        nodes.push({ ...node, color: selectedSongs.find(song => song.id === node.id)?.color });
         if (node.type === 'song') {
             const song = songs.find(song => song.id === node.id);
             song.artists.forEach(artist => {
@@ -141,7 +141,7 @@ const renderGraphChart = () => {
                 }
 
                 // Show the artist-song link only if 1) album is not visible or 2) artist is not in the album (i.e. artist only contributed to the song) or 3) album or arist are not opened, as it would make a redundant link. 
-                if (!albumInNodes || !artistInAlbum || (!albumOpened && !artistOpened) ) {
+                if (!albumInNodes || !artistInAlbum || (!albumOpened && !artistOpened)) {
                     links.push({ source: node.id, target: artist.id });
                 }
                 // Else make sure that there is a link between the song and the album, so that the artist will be related to the song through the album.
@@ -188,7 +188,7 @@ const renderGraphChart = () => {
     const update = (data) => {
         let link = g.selectAll("line");
         let node = g.selectAll("circle");
-        
+
         // Create nodes
         let localNode = node.data(data.nodes);
         localNode.exit().remove();
@@ -198,7 +198,7 @@ const renderGraphChart = () => {
                 const nodeOpen = openedNodes.some(node => node.id === d.id);
                 // Set node size based on whether the node is opened or not
                 const nodeSize = nodeOpen ? 500 : 200;
-                
+
                 // Set node shape based on the type of the node
                 if (d.type === 'song') {
                     return d3.symbol().type(d3.symbolCircle).size(nodeSize)();
@@ -215,7 +215,7 @@ const renderGraphChart = () => {
             // Give it a fill color based on the color of the song, or black if no color is set
             .attr("fill", d => d.color || 'black')
             // Give it a border that is white (invisible) if the node is not opened, and grey if it is opened
-            .attr("stroke", d => openedNodes.some(node => node.id === d.id) ? '#cccccc' : (d.edge || "white")) 
+            .attr("stroke", d => openedNodes.some(node => node.id === d.id) ? '#cccccc' : (d.edge || "white"))
             .attr("stroke-width", 2)
 
             // Handle click on nodes to open or close them
@@ -267,7 +267,7 @@ const renderGraphChart = () => {
         // Add title to the nodes, which appears when hovering over the node
         localNode.append("title")
             .text(d => (d.type.charAt(0).toUpperCase() + d.type.slice(1) + ': ' + d.name));
-        
+
         // Create links, which are the lines between the nodes, these are mapped to the data.links
         const ticked = () => {
             g.selectAll("line")
