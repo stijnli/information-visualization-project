@@ -76,8 +76,6 @@ fetch('data/songs.json')
     })
     .catch(error => console.error('Error loading songs:', error));
 
-renderMusicSelection();
-
 
 
 
