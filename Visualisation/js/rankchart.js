@@ -18,50 +18,60 @@ function setMeasurements(data) {
 }
 
 function renderRankChart() {
-  console.log(selectedSongs);
   let selectedSongsIds = selectedSongs.map((song) => song.id);
-  console.log(ids);
-  // console.log(measurements) //0vrKBjEBQAVn3sdhIXmpHE
-  let rankings = measurements.filter((entry) => selectedSongsIds.includes(entry.spotify_id) && entry.country === 'NL');
-  console.log(rankings);
+  let rankings = measurements.filter(
+    (entry) =>
+      selectedSongsIds.includes(entry.spotify_id) && entry.country === "NL"
+  );
+
+  var sumstat = d3.group(rankings, (d) => d.spotify_id);
+
+  const x = d3
+    .scaleTime()
+    .domain(
+      d3.extent(measurements, function (d) {
+        return d.snapshot_date;
+      })
+    )
+    .range([0, width]);
+
+  xAxis = svg
+    .append("g")
+    .attr("transform", `translate(0, ${height})`)
+    .call(d3.axisBottom(x));
+
+  const y = d3
+    .scaleLinear()
+    .domain([51,1])
+    .range([height, 0]);
+  yAxis = svg.append("g").call(d3.axisLeft(y));
+
+  svg
+    .selectAll(".line")
+    .data(sumstat)
+    .join("path")
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("stroke-width", 1.5)
+    .attr("d", (d) => {
+      return d3
+        .line()
+        .x((d) => {
+          return x(d.snapshot_date);
+        })
+        .y((d) => {
+          return y(+d.daily_rank);
+        })(d[1]);
+    });
 }
 
-d3.csv(
-  "data/measurementssmallnl.csv",
-
-  // When reading the csv, I must format variables:
-  // function (d) {
-  //   return { date: d3.timeParse("%Y-%m-%d")(d.date), value: d.value };
-  // }
-).then(
-  // Now I can use this dataset:
-  function (data) {
-    // Add X axis --> it is a date format
-    const x = d3
-      .scaleTime()
-      .domain(
-        d3.extent(data, function (d) {
-          return d.date;
-        })
-      )
-      .range([0, width]);
-    xAxis = svg
-      .append("g")
-      .attr("transform", `translate(0, ${height})`)
-      .call(d3.axisBottom(x));
-
-    // Add Y axis
-    const y = d3
-      .scaleLinear()
-      .domain([
-        0,
-        d3.max(data, function (d) {
-          return +d.value;
-        }),
-      ])
-      .range([height, 0]);
-    yAxis = svg.append("g").call(d3.axisLeft(y));
-
-    setMeasurements(data);
-  }
-);
+d3.csv("data/measurements_full.csv", (d) => {
+  return {
+    spotify_id: d.spotify_id,
+    snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
+    daily_rank: d.daily_rank,
+    country: d.country,
+  };
+}).then((data) => {
+  setMeasurements(data);
+});
