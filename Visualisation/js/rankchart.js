@@ -12,17 +12,27 @@ const svg = d3
   .append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+let measurements = [];
+function setMeasurements(data) {
+  measurements = data;
+}
+
 function renderRankChart() {
   console.log(selectedSongs);
+  let selectedSongsIds = selectedSongs.map((song) => song.id);
+  console.log(ids);
+  // console.log(measurements) //0vrKBjEBQAVn3sdhIXmpHE
+  let rankings = measurements.filter((entry) => selectedSongsIds.includes(entry.spotify_id) && entry.country === 'NL');
+  console.log(rankings);
 }
 
 d3.csv(
-  "data/measurements.csv",
+  "data/measurementssmallnl.csv",
 
   // When reading the csv, I must format variables:
-  function (d) {
-    return { date: d3.timeParse("%Y-%m-%d")(d.date), value: d.value };
-  }
+  // function (d) {
+  //   return { date: d3.timeParse("%Y-%m-%d")(d.date), value: d.value };
+  // }
 ).then(
   // Now I can use this dataset:
   function (data) {
@@ -51,5 +61,7 @@ d3.csv(
       ])
       .range([height, 0]);
     yAxis = svg.append("g").call(d3.axisLeft(y));
+
+    setMeasurements(data);
   }
 );
