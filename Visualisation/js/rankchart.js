@@ -18,6 +18,8 @@ function setMeasurements(data) {
 }
 
 function renderRankChart() {
+  svg.selectAll("*").remove();
+
   let selectedSongsIds = selectedSongs.map((song) => song.id);
   let rankings = measurements.filter(
     (entry) =>
@@ -28,11 +30,7 @@ function renderRankChart() {
 
   const x = d3
     .scaleTime()
-    .domain(
-      d3.extent(measurements, function (d) {
-        return d.snapshot_date;
-      })
-    )
+    .domain(d3.extent(rankings, d => d.snapshot_date))
     .range([0, width]);
 
   xAxis = svg
