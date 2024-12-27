@@ -21,11 +21,12 @@
 	<script src="js/d3.v7.min.js"></script>
 
 	<!-- own js files -->
-	<script src="js/main.js"></script>
+	<script src="js/main.js" defer></script>
+	<script src="js/menu.js"></script>
 
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-md-3">
+			<div class="col-md-3" style="background-color: lightblue;">
 				<!-- Content for the left column -->
 				<div class="container">
 					<div class="row">
@@ -35,7 +36,21 @@
 					</div>
 					<div class="row">
 						<div class="col-12">
-							<h2>Music selection</h2>
+							<h2>Selected songs</h2>
+							<div class="input-group" id="searchBar">
+								<input type="text" id="searchTerm" class="form-control" placeholder="Search for music..."
+									oninput="setCurrentSearchTerm(document.getElementById('searchTerm').value)">
+							</div>
+							<div
+								style="position: absolute; z-index: 1; width: 100%; padding-right:0px; margin-left:-10px">
+								<div id="searchResults"
+									style="display: none; background-color: lightgrey; overflow-y: auto; max-height:600px;overflow-x: hidden;box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);border-radius: 5px; padding:10px;">
+
+								</div>
+							</div>
+						</div>
+						<div class="col-12" id="musicSelection" style="max-height: 600px; overflow-y: auto;">
+
 						</div>
 					</div>
 				</div>
