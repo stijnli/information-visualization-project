@@ -51,7 +51,7 @@ function renderRankChart() {
     .data(sumstat)
     .join("path")
     .attr("fill", "none")
-    .attr("stroke", "black")
+    .attr("stroke", d => getSongColor(d[0]))
     .attr("stroke-width", 1.5)
     .attr("d", (d) => {
       return d3
@@ -65,7 +65,7 @@ function renderRankChart() {
     });
 }
 
-d3.csv("data/measurements_full.csv", (d) => {
+d3.csv("data/measurementssmallnl.csv", (d) => {
   return {
     spotify_id: d.spotify_id,
     snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),

@@ -67,6 +67,10 @@ const addSong = (songId) => {
     setSelectedSongs([...selectedSongs, newSong]);
 };
 
+const getSongColor = (id) => {
+    return selectedSongs.find(song => song.id === id)?.color;
+}
+
 // Define data loading, try not to load the data multiple times.
 fetch('data/songs.json')
     .then(response => response.json())
