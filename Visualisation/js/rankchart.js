@@ -13,56 +13,56 @@ const svg = d3
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 let measurements = [];
-function setMeasurements(data) {
+const setMeasurements = (data) => {
   measurements = data;
 }
 
 function renderRankChart() {
+  // Remove all lines in the graph
   svg.selectAll("*").remove();
 
+  // Get ranking data from selected songs and group by spotify id
   let selectedSongsIds = selectedSongs.map((song) => song.id);
-  let rankings = measurements.filter(
+  let selectedSongMeasurements = measurements.filter(
     (entry) =>
-      selectedSongsIds.includes(entry.spotify_id) && entry.country === "NL"
+      selectedSongsIds.includes(entry.spotify_id) && entry.country === "NL" // TODO currently only for NL, should be different
+  );
+  var groupedSelectedMeasurements = d3.group(
+    selectedSongMeasurements,
+    (d) => d.spotify_id
   );
 
-  var sumstat = d3.group(rankings, (d) => d.spotify_id);
-
+  // Scale the x-axis for time data
   const x = d3
     .scaleTime()
-    .domain(d3.extent(rankings, d => d.snapshot_date))
+    .domain(d3.extent(selectedSongMeasurements, (d) => d.snapshot_date))
     .range([0, width]);
-
   xAxis = svg
     .append("g")
     .attr("transform", `translate(0, ${height})`)
     .call(d3.axisBottom(x));
 
-  const y = d3
-    .scaleLinear()
-    .domain([51,1])
-    .range([height, 0]);
+  // Scale the y-axis for ranking 1-50
+  const y = d3.scaleLinear().domain([51, 1]).range([height, 0]);
   yAxis = svg.append("g").call(d3.axisLeft(y));
 
+  // Draw the ranking lines
   svg
     .selectAll(".line")
-    .data(sumstat)
+    .data(groupedSelectedMeasurements)
     .join("path")
     .attr("fill", "none")
-    .attr("stroke", d => getSongColor(d[0]))
-    .attr("stroke-width", 1.5)
-    .attr("d", (d) => {
-      return d3
+    .attr("stroke", (d) => getSongColor(d[0]))
+    .attr("stroke-width", 2)
+    .attr("d", (d) =>
+      d3
         .line()
-        .x((d) => {
-          return x(d.snapshot_date);
-        })
-        .y((d) => {
-          return y(+d.daily_rank);
-        })(d[1]);
-    });
+        .x((d) => x(d.snapshot_date))
+        .y((d) => y(+d.daily_rank))(d[1])
+    );
 }
 
+// Read the CSV and format it for D3
 d3.csv("data/measurementssmallnl.csv", (d) => {
   return {
     spotify_id: d.spotify_id,
