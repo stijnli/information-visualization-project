@@ -1,0 +1,12 @@
+services:
+  static-host:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/usr/share/nginx/html:ro
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /usr/share/nginx/html
