@@ -19,6 +19,7 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
+    renderRankChart();
 };
 
 let currentHoveredSongId = undefined;
