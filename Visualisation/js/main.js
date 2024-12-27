@@ -100,8 +100,6 @@ const addSong = (songId) => {
     setSelectedSongs([...selectedSongs, newSong]);
 };
 
-
-
 const initializeLoad = () => {
     // Define data loading, try not to load the data multiple times.
     fetch('data/songs.json')
