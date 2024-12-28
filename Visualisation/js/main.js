@@ -28,10 +28,12 @@ const setCurrentHoveredSongId = (newSongId) => {
     // Update the border of the song image
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
         document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
+        document.getElementById(`rankchart-'${currentHoveredSongId}'`).style.opacity = 0.5;
     }
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
+        document.getElementById(`rankchart-'${newSongId}'`).style.opacity = 1;
     }
 
     currentHoveredSongId = newSongId

@@ -1,6 +1,6 @@
 // set the dimensions and margins of the graph
 const margin = { top: 10, right: 30, bottom: 30, left: 60 },
-  width = 680 - margin.left - margin.right,
+  width = 500 - margin.left - margin.right,
   height = 450 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
@@ -53,13 +53,17 @@ function renderRankChart() {
     .join("path")
     .attr("fill", "none")
     .attr("stroke", (d) => getSongColor(d[0]))
-    .attr("stroke-width", 2)
+    .attr("stroke-width", 3)
+    .attr("id", (d) => `rankchart-'${d[0]}'`)
     .attr("d", (d) =>
       d3
         .line()
         .x((d) => x(d.snapshot_date))
         .y((d) => y(+d.daily_rank))(d[1])
-    );
+    ).clone()
+    .attr('stroke', 'transparent').attr('stroke-width', 15)
+    .attr("onmouseover",(d) => `setCurrentHoveredSongId('${d[0]}')`)
+    .attr("onmouseout", "setCurrentHoveredSongId(undefined)")
 }
 
 // Read the CSV and format it for D3
