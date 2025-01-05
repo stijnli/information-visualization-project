@@ -21,8 +21,16 @@
 	<script src="js/d3.v7.min.js"></script>
 
 	<!-- own js files -->
-	<script src="js/main.js" defer></script>
 	<script src="js/menu.js"></script>
+	<script src="js/graph_chart.js"></script>
+
+
+	<script src="js/main.js"></script>
+	<script>
+		window.addEventListener('load', function () {
+			initializeLoad();
+		});
+	</script>
 
 	<div class="container-fluid">
 		<div class="row">
@@ -59,8 +67,15 @@
 			<div class="col-md-9">
 				<div class="row" style="height: 500px;">
 					<div class="col-12">
-						<h2>Music graph can be placed here</h2>
-						<!-- Content for the first row, single column -->
+						<h2>
+							Graph chart
+						</h2>
+						<p>
+							Below, you can see a graph chart that allows you to explore the relationship between
+							different songs, artists, albums and genres. Left-clicking on nodes opens and closes their
+							children, while right-clicking on songs (only circles) adds them to the selected song list.
+						</p>
+						<div id="graphChart" style="height: 400px; width: 100%;"></div>
 					</div>
 				</div>
 				<div class="row" style="height: 450px;">

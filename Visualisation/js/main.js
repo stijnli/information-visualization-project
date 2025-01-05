@@ -19,18 +19,41 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
+    renderGraphChart();
 };
 
 let currentHoveredSongId = undefined;
+let oldHoveredSongOutlineColor = undefined;
 const setCurrentHoveredSongId = (newSongId) => {
-
+    const oldSongIsSelected = selectedSongs.some(song => song.id === currentHoveredSongId);
     // Update the border of the song image
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
+        if(oldSongIsSelected) {
         document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
+        }
+
+        // Change svg node stroke
+        document.getElementById("graphNode-" + currentHoveredSongId).style.stroke = oldHoveredSongOutlineColor
+    }
+
+    if (newSongId === undefined) {
+        return;
+    }
+
+    const songIsSelected = selectedSongs.some(song => song.id === newSongId);
+
+    if (!songIsSelected) {
+        return;
     }
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
+        
+        // Change svg node stroke
+        graphNode = document.getElementById("graphNode-" + newSongId)
+        oldHoveredSongOutlineColor = graphNode.style.stroke
+        graphNode.style.stroke = "black"
+
     }
 
     currentHoveredSongId = newSongId
@@ -49,6 +72,17 @@ const setSongs = (songsData) => {
     songs = songsData;
 };
 
+let artists = [];
+const setArtists = (artistsData) => {
+    artists = artistsData;
+};
+
+let albums = [];
+const setAlbums = (albumsData) => {
+    albums = albumsData;
+};
+
+
 // Define some commonly used state-mutation functions (functions that use the setter functions to change the state)
 const removeSong = (songId) => {
     // Remove the song from the selection
@@ -66,16 +100,60 @@ const addSong = (songId) => {
     setSelectedSongs([...selectedSongs, newSong]);
 };
 
-// Define data loading, try not to load the data multiple times.
-fetch('data/songs.json')
-    .then(response => response.json())
-    .then(songs => {
-        setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 10));
-        setSongs(songs);
+const initializeLoad = () => {
+    // Define data loading, try not to load the data multiple times.
+    fetch('data/songs.json')
+        .then(response => response.json())
+        .then(songs => {
+            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
+            setSongs(songs);
 
-    })
-    .catch(error => console.error('Error loading songs:', error));
+            let albumsMap = new Map();
+            songs.forEach(song => {
+                if (!albumsMap.has(song.album.id)) {
+                    albumsMap.set(song.album.id, song.album);
+                }
+                albumsMap.get(song.album.id).songs = albumsMap.get(song.album.id).songs || new Set();
+                albumsMap.get(song.album.id).songs.add(song);
+            });
+            albums = [...albumsMap.values()];
+
+        }).then(() => {
+            fetch('data/artists.json')
+                .then(response => response.json())
+                .then(artists => {
+                    songsPerArtist = new Map();
+                    albumsPerArtist = new Map();
+                    songs.forEach(song => {
+                        song.artists.forEach(artist => {
+                            if (!songsPerArtist.has(artist.id)) {
+                                songsPerArtist.set(artist.id, new Set());
+                            }
+                            songsPerArtist.get(artist.id).add(song);
+                        });
+
+                        song.album.artists.forEach(artist => {
+                            if (!albumsPerArtist.has(artist.id)) {
+                                albumsPerArtist.set(artist.id, new Set());
+                            }
+                            albumsPerArtist.get(artist.id).add(song.album);
+                        });
 
 
+                    });
+                    artists.forEach(artist => {
+                        artist.songs = [...songsPerArtist.get(artist.id) || new Set()];
+                        artist.albums = [...albumsPerArtist.get(artist.id) || new Set()];
+                    });
+                    setArtists(artists);
+                });
+        })
+        .catch(error => console.error('Error loading data:', error));
+
+
+
+    renderMusicSelection();
+    renderGraphChart();
+};
 
 
