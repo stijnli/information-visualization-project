@@ -1,5 +1,3 @@
 data_preparation/spotify.csv
 data_preparation/output
-Visualisation/css/bootstrap.min.css
-Visualisation/js/bootstrap.min.js
-Visualisation/js/d3.v7.min.js
+Visualisation/data
