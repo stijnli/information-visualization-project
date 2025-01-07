@@ -20,6 +20,7 @@ const setSelectedSongs = (newSelectedSongs) => {
     // Execute rerenders
     renderMusicSelection();
     renderGraphChart();
+    renderTable();
 };
 
 let currentHoveredSongId = undefined;
