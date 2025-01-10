@@ -10,10 +10,45 @@ const setSelectedCountry = (countryCode) => {
   selectedCountry = countryCode;
 };
 
-let allCountryOptions = [];
-const setAllCountryOptions = (data) => {
-  allCountryOptions = data;
+let countryOptions = [];
+const setCountryOptions = (listOfCountryOptions) => {
+  countryOptions = listOfCountryOptions;
 };
+
+function updateCountryDropdownMenu() {
+  //TODO update countryOptions to reflect what countries greyed
+
+  var notGreyed = countryOptions.filter((d) => d.greyed === false && d.pinned === false);
+  var greyed = countryOptions.filter((d) => d.greyed === true && d.pinned === false);
+  var pinned = countryOptions.filter((d) => d.pinned === true);
+
+  setCountryOptions([
+    ...pinned,
+    ...sortCountryOptionsAlphabetically(notGreyed),
+    ...sortCountryOptionsAlphabetically(greyed),
+  ]);
+
+  var optionsList = [];
+  countrySelect = document.getElementById("countrySelect");
+  for (const countryOption of countryOptions) {
+    optionsList.push(
+      new Option(
+        countryOption.countryName,
+        countryOption.countryCode,
+        null,
+        selectedCountry === countryOption.countryCode
+      )
+    );
+  }
+
+  countrySelect.replaceChildren(...optionsList);
+}
+
+function selectCountry(countryCode) {
+  setSelectedCountry(countryCode);
+  updateCountryDropdownMenu();
+  renderRankChart();
+}
 
 // set the dimensions and margins of the graph
 const margin = { top: 10, right: 30, bottom: 30, left: 60 },
@@ -33,45 +68,6 @@ function sortCountryOptionsAlphabetically(arrayOfOptions) {
   return arrayOfOptions.sort((a, b) =>
     a.countryName.localeCompare(b.countryName, "en", { sensitivity: "base" })
   );
-}
-
-function updateCountryDropdownMenu() {
-  //dropdown menu consisting of all country names (written out), with value shorthand country. labels can be greyed out, but still clickable. Global is on top always, with hr under that. then, its all sorted alphabetically, but grouped on greyed and not greyed(on top)
-  console.log(allCountryOptions);
-  var notGreyed = allCountryOptions.filter(
-    (d) => d.greyed === false && d.pinned === false
-  );
-  var greyed = allCountryOptions.filter(
-    (d) => d.greyed === true && d.pinned === false
-  );
-  var pinned = allCountryOptions.filter((d) => d.pinned === true);
-
-  setAllCountryOptions([
-    ...pinned,
-    ...sortCountryOptionsAlphabetically(notGreyed),
-    ...sortCountryOptionsAlphabetically(greyed),
-  ]);
-
-  var optionsList = [];
-  countrySelect = document.getElementById("countrySelect");
-  for (const countryOption of allCountryOptions) {
-    optionsList.push(
-      new Option(
-        countryOption.countryName,
-        countryOption.countryCode,
-        null,
-        selectedCountry === countryOption.countryCode
-      )
-    );
-  }
-
-  countrySelect.replaceChildren(...optionsList);
-}
-
-function selectCountry(countryCode) {
-  setSelectedCountry(countryCode);
-  updateCountryDropdownMenu();
-  renderRankChart();
 }
 
 function renderRankChart() {
@@ -112,6 +108,7 @@ function renderRankChart() {
     .attr("fill", "none")
     .attr("stroke", (d) => getSongColor(d[0]))
     .attr("stroke-width", 3)
+    .attr("opacity", 0.5)
     .attr("id", (d) => `rankchart-'${d[0]}'`)
     .attr("d", (d) =>
       d3
@@ -169,5 +166,5 @@ d3.csv("data/measurements_full.csv", (d) => {
       pinned: true,
     });
 
-    setAllCountryOptions(countryOptions);
+    setCountryOptions(countryOptions);
   });
