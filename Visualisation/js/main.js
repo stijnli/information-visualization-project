@@ -1,19 +1,26 @@
 // Define config variables
 const config = {
-    songColors: ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D', '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC', '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399', '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933', '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'],
+    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00",  "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
     maxSelectedSongs: 10
 }
 
 // Define variables (all variables have a getter and setter function so that related functions can be called when the value is changed). 
 // IMPORTANT: Never change the value of a variable directly, always use the setter function.
 
+const colorQueue = [...config.songColors];
+
 let selectedSongs = [];
 const setSelectedSongs = (newSelectedSongs) => {
-    // Reassign colors
-    newSelectedSongs.forEach((song, index) => {
-        song.color = config.songColors[index % config.songColors.length];
-    }
-    );
+    // Check which songs have been removed and add their colors back to the queue
+    const removedSongs = selectedSongs.filter(song => !newSelectedSongs.some(newSong => newSong.id === song.id));
+    removedSongs.forEach(song => colorQueue.push(song.color));
+
+    // Assign colors to the new songs
+    const addedSongs = newSelectedSongs.filter(song => !selectedSongs.some(oldSong => oldSong.id === song.id));
+    addedSongs.forEach(song => {
+        song.color = colorQueue.pop();
+    });
+
 
     selectedSongs = newSelectedSongs;
 
@@ -49,7 +56,7 @@ const setCurrentHoveredSongId = (newSongId) => {
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
-        
+
         // Change svg node stroke
         graphNode = document.getElementById("graphNode-" + newSongId)
         oldHoveredSongOutlineColor = graphNode.style.stroke
