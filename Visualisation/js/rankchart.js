@@ -1,3 +1,5 @@
+const globalName = 'Global';
+
 // set the dimensions and margins of the graph
 const margin = { top: 10, right: 30, bottom: 30, left: 60 },
   width = 500 - margin.left - margin.right,
@@ -17,6 +19,70 @@ const setMeasurements = (data) => {
   measurements = data;
 }
 
+let selectedCountry = "";
+const setSelectedCountry = (countryCode) => {
+  selectedCountry = countryCode;
+}
+
+let allCountries = [];
+const setAllCountries = (data) => {
+  allCountries = data;
+}
+
+let allCountryOptions = [];
+const setAllCountryOptions = (data) => {
+  allCountryOptions = data;
+}
+
+// function initCountryDropdownMenu() {
+//   // updateCountryDropdownMenu();
+//   countrySelect = document.getElementById('countrySelect');
+//   for (const countryOption of allCountryOptions) {
+//     countrySelect.options.add(new Option(countryOption.countryName,countryOption.countryCode, countryOption.pinned) )
+//   }
+// }
+
+// function setCountryDropdownMenuOptions() {
+//   updateCountryDropdownMenu();
+//   countrySelect = document.getElementById('countrySelect');
+//   for (const countryOption of allCountryOptions) {
+//     countrySelect.options.add(new Option(countryOption.countryName,countryOption.countryCode, countryOption.pinned) )
+//   }
+// }
+
+function sortCountryOptionsAlphabetically(arrayOfOptions) {
+  return arrayOfOptions.sort( (a, b) => a.countryName.localeCompare(b.countryName, 'en', {'sensitivity': 'base'}));
+}
+
+
+
+function updateCountryDropdownMenu() {
+  //dropdown menu consisting of all country names (written out), with value shorthand country. labels can be greyed out, but still clickable. Global is on top always, with hr under that. then, its all sorted alphabetically, but grouped on greyed and not greyed(on top)
+  console.log(allCountryOptions);
+  var notGreyed = allCountryOptions.filter(d => d.greyed === false && d.pinned === false);
+  var greyed = allCountryOptions.filter(d => d.greyed === true && d.pinned === false);
+  var pinned = allCountryOptions.filter(d => d.pinned === true);
+
+  setAllCountryOptions([...pinned, ...sortCountryOptionsAlphabetically(notGreyed), ...sortCountryOptionsAlphabetically(greyed)]);
+  
+  var optionsList = [];
+  countrySelect = document.getElementById('countrySelect');
+  for (const countryOption of allCountryOptions) {
+    // if (selectedCountry === countryOption.countryCode){
+      optionsList.push(new Option(countryOption.countryName,countryOption.countryCode,null,selectedCountry === countryOption.countryCode) )
+    // }
+    // optionsList.push(new Option(countryOption.countryName,countryOption.countryCode) )
+  }
+
+  countrySelect.replaceChildren(...optionsList);
+}
+
+function selectCountry(selector) {
+  setSelectedCountry(selector.value);
+  updateCountryDropdownMenu();
+  renderRankChart();
+}
+
 function renderRankChart() {
   // Remove all lines in the graph
   svg.selectAll("*").remove();
@@ -25,7 +91,7 @@ function renderRankChart() {
   let selectedSongsIds = selectedSongs.map((song) => song.id);
   let selectedSongMeasurements = measurements.filter(
     (entry) =>
-      selectedSongsIds.includes(entry.spotify_id) && entry.country === "NL" // TODO currently only for NL, should be different
+      selectedSongsIds.includes(entry.spotify_id) && entry.country === selectedCountry
   );
   var groupedSelectedMeasurements = d3.group(
     selectedSongMeasurements,
@@ -67,7 +133,7 @@ function renderRankChart() {
 }
 
 // Read the CSV and format it for D3
-d3.csv("data/measurementssmallnl.csv", (d) => {
+d3.csv("data/measurements_full.csv", (d) => {
   return {
     spotify_id: d.spotify_id,
     snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
@@ -76,4 +142,25 @@ d3.csv("data/measurementssmallnl.csv", (d) => {
   };
 }).then((data) => {
   setMeasurements(data);
-});
+
+  let uniqueCountries = [...new Set(data.map(d => d.country))]; 
+  setAllCountries(uniqueCountries);
+  return fetch('data/alpha2ToCountryName.json');
+})
+.then(response => response.json())
+.then((alpha2ToCountryCode) => {
+    let countryOptions = [];
+    let optionObject;
+    console.log(alpha2ToCountryCode);
+    for(const countryCode of allCountries) {
+      countryName = alpha2ToCountryCode[countryCode] ?? null;
+      if (countryName === null) {
+        continue;
+      }
+      optionObject = {countryCode: countryCode, countryName: countryName, greyed:false, pinned:false};
+      countryOptions.push(optionObject);
+    }
+    countryOptions.push({countryCode: "", countryName: globalName, greyed:false, pinned:true});
+    setAllCountryOptions(countryOptions);
+    // initCountryDropdownMenu();
+  });

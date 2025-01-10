@@ -20,6 +20,7 @@ const setSelectedSongs = (newSelectedSongs) => {
     // Execute rerenders
     renderMusicSelection();
     renderRankChart();
+    updateCountryDropdownMenu();
 };
 
 let currentHoveredSongId = undefined;
