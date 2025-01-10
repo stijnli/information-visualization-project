@@ -16,7 +16,17 @@ const setCountryOptions = (listOfCountryOptions) => {
 };
 
 function updateCountryDropdownMenu() {
-  //TODO update countryOptions to reflect what countries greyed
+  let selectedSongsIds = selectedSongs.map((song) => song.id);
+  let selectedSongMeasurements = measurements.filter((entry) => selectedSongsIds.includes(entry.spotify_id));
+  let countriesForSelectedSongs = [...new Set(selectedSongMeasurements.map((d) => d.country))]
+
+  for (const countryOption of countryOptions) {
+    if (countriesForSelectedSongs.includes(countryOption.countryCode)) {
+      countryOption.greyed = false;
+    } else {
+      countryOption.greyed = true;
+    }
+  }
 
   var notGreyed = countryOptions.filter((d) => d.greyed === false && d.pinned === false);
   var greyed = countryOptions.filter((d) => d.greyed === true && d.pinned === false);
@@ -28,17 +38,21 @@ function updateCountryDropdownMenu() {
     ...sortCountryOptionsAlphabetically(greyed),
   ]);
 
-  var optionsList = [];
+  let optionsList = [];
+  let newOption;
   countrySelect = document.getElementById("countrySelect");
   for (const countryOption of countryOptions) {
-    optionsList.push(
-      new Option(
-        countryOption.countryName,
-        countryOption.countryCode,
-        null,
-        selectedCountry === countryOption.countryCode
-      )
-    );
+    newOption = new Option(
+      countryOption.countryName,
+      countryOption.countryCode,
+      null,
+      selectedCountry === countryOption.countryCode
+    )
+    if (countryOption.greyed === true) {
+      newOption.classList.add("greyed");
+    }
+
+    optionsList.push(newOption);
   }
 
   countrySelect.replaceChildren(...optionsList);
