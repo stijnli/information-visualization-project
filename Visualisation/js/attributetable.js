@@ -3,7 +3,7 @@
 
 /// --- prepDataTable takes the raw data and prepares in an array; 
 // the index of each element in tempRow is used in the objects of "attributes" as "arrayIndex" 
-function prepDataTable(data, config) {
+function prepDataTable(data) {
     let Rows = [];
     let tempRow = [];
     for (let i = 0; i < data.length; i++) {
@@ -18,7 +18,7 @@ function prepDataTable(data, config) {
         data[i].tempo,
         data[i].valence,
         data[i].loudness,
-        config.songColors[i]];
+        data[i].color];
         Rows.push(tempRow);
         console.log(Rows[i]);
     }
@@ -48,9 +48,30 @@ function cropText(textElement, text, widthElement) {
 
     return croppedText;
 }
+function renderLengthSong(svgObject, songTitle, songArtists){
+    const tempTitle = svgObject.append("text")
+        .attr("visibility", "hidden")
+        .text(songTitle);
+    const tempArtists = svgObject.append("text")
+        .attr("visibility", "hidden")
+        .text(songArtists);
+    let renderLength
+if (tempTitle.node().getComputedTextLength() < tempArtists.node().getComputedTextLength()) {
+    renderLength = tempArtists.node().getComputedTextLength()
+}
+else {
+    renderLength = tempTitle.node().getComputedTextLength()
+}
+// Remove the temporary element after measuring
+tempTitle.remove();
+tempArtists.remove();
+console.log("renderlength",renderLength);
+return renderLength;
+}
 
-function makeScrolingSongTitle(svgTable, tableData, i) {
-    let textElement = svgTable.append("g")
+
+function makeScrolingSongTitle(svgObject, data, widthScroling, i) {
+    let textElement = svgObject.append("g")
         .attr("clip-path", "url(#clip-border" + i + ")")
         .append("text")
         .attr("id", "song" + i + "inTableScroll")
@@ -65,23 +86,23 @@ function makeScrolingSongTitle(svgTable, tableData, i) {
     textElement.append("tspan")
         .attr("class", "card-title")
         .attr("dy", "0")
-        .text(tableData[i][1])
+        .text(data[i][1])
         .style("pointer-events", "none");
 
     textElement.append("tspan")
         .attr("class", "card-text")
         .attr("x", 5)
         .attr("dy", "1.2em")
-        .text(tableData[i][2])
+        .text(data[i][2])
         .style("pointer-events", "none");
 
     // scrolling effect
     textElement.append("animateTransform")
         .attr("attributeName", "transform")
         .attr("type", "translate")
-        .attr("from", widthSong)   // Starting position (right)
-        .attr("to", "-100")    // Ending position (left)
-        .attr("dur", "5s")
+        .attr("from", widthScroling)   // Starting position (right)
+        .attr("to", -renderLengthSong(svgObject, data[i][1], data[i][2]))    // Ending position (left)
+        .attr("dur", renderLengthSong(svgObject, data[i][1], data[i][2] + widthScroling) /25 + "s")
         .attr("repeatCount", "indefinite"); // Infinite scrolling
 }
 
@@ -102,7 +123,7 @@ const heightElement = height / 11
 
 const renderTable = () => {
     let data = selectedSongs
-    let tableData = prepDataTable(data, config);
+    let tableData = prepDataTable(data);
 
     // Definition of the luminance scales which are then stored in "attributes" as "scale"
     let colorScaleDanceability = d3.scaleLinear()
@@ -180,7 +201,7 @@ const renderTable = () => {
     { id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, arrayIndex: 10, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db." }]
 
 
-    let svgTable = d3.select("#attrributeTable")
+    let svgTable = d3.select("#attributeTable")
     svgTable.selectAll("*").remove();
     svgTable = svgTable.append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -250,13 +271,13 @@ const renderTable = () => {
             .attr("y", heightElement + heightElement * i)
             .attr("width", widthSong)
             .attr("height", heightElement)
-            .attr("fill-opacity", 0)
+            .attr("fill", tableData[i][11])
             .attr("stroke-width", 2)
             .attr("stroke", "black")
             .on("mouseover", function () {
                 d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, i); //places the scrolling song title
+                makeScrolingSongTitle(svgTable, tableData, widthSong, i); //places the scrolling song title
             })
             .on("mouseout", function () {
                 d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
@@ -273,7 +294,7 @@ const renderTable = () => {
             .on("mouseover", function () {
                 d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, i); //places the scrolling song title
+                makeScrolingSongTitle(svgTable, tableData, widthSong, i); //places the scrolling song title
             })
             .on("mouseout", function () {
                 d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
