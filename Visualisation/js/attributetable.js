@@ -208,7 +208,15 @@ const renderTable = () => {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    // appending the headline of the Table
+    // appending an outline for the whole table
+    svgTable.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", heightElement*(data.length + 1))
+        .attr("fill", "none")
+        .attr("stroke", "black")
+    // appending the headline of the table
     svgTable.append("rect")
         .attr("x", 0)
         .attr("y", 0)
@@ -248,15 +256,6 @@ const renderTable = () => {
     // making the table grid and append the values to the table
 
     for (let i = 0; i < tableData.length; i++) {
-
-        svgTable.append("rect")// adding box for higlighting a row when on hover
-            .attr("id", "Row" + i + "highlight")
-            .attr("x", 0)
-            .attr("y", heightElement + (heightElement * i))
-            .attr("width", width)
-            .attr("height", heightElement)
-            .attr("fill", "none");
-
         svgTable.append("clipPath")// for the scrolling text while hoveriong over one specific song
             .attr("id", "clip-border" + i)
             .append("rect")
@@ -273,7 +272,7 @@ const renderTable = () => {
             .attr("height", heightElement)
             .attr("fill", tableData[i][11])
             .attr("stroke-width", 2)
-            .attr("stroke", "black")
+            .attr("stroke","black")
             .on("mouseover", function () {
                 d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
@@ -284,6 +283,14 @@ const renderTable = () => {
                 d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
                 d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
             });
+        svgTable.append("rect")// adding box for higlighting a row when on hover
+            .attr("id", "Row" + i + "highlight")
+            .attr("x", 0)
+            .attr("y", heightElement + (heightElement * i))
+            .attr("width", width)
+            .attr("height", heightElement)
+            .attr("fill", "none")
+            .style("pointer-events", "none");
 
         svgTable.append("text")// append static title to first collunm
             .attr("id", "song" + i + "inTable")
@@ -306,7 +313,7 @@ const renderTable = () => {
 
         for (let j = 0; j < attributes.length; j++) {
             svgTable.append("rect")
-                .attr("class", attributes[j].id + " Row" + i)
+                .attr("id", attributes[j].id + " Row" + i)
                 .attr("x", widthSong + ((width - widthSong) / attributes.length) * j)
                 .attr("y", heightElement + heightElement * i)
                 .attr("width", ((width - widthSong) / attributes.length))
@@ -317,13 +324,30 @@ const renderTable = () => {
                 .attr("stroke", "none")
                 .on("mouseover", function () {
                     d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+                    d3.select("#" + attributes[j].id + "Row" + i + "value").style("visibility", "visible");
                 })
                 .on("mouseout", function () {
                     d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
+                    d3.select("#" + attributes[j].id + "Row" + i + "value").style("visibility", "hidden");
                 });
+            svgTable.append("text")
+                .attr("id", attributes[j].id + "Row" + i + "value")
+                .style("text-anchor", "middle")
+                .text(tableData[i][attributes[j].arrayIndex])
+                .attr("class", "tableHeadline")
+                .attr("x", widthSong + ((width - widthSong) / attributes.length) * (j + 0.5))
+                .attr("y", heightElement + heightElement * (i + 0.5))
+                .attr("dominant-baseline", "central")
+                .style("visibility", "hidden")
+                .style("pointer-events", "none");
+            if (attributes[j].scale(tableData[i][attributes[j].arrayIndex]) < 0.5){
+                d3.select("#" + attributes[j].id + "Row" + i + "value").attr("fill", "black");  
+            }
+            else{
+                d3.select("#" + attributes[j].id + "Row" + i + "value").attr("fill", "white");
+            }
         }
     }
-
 }
 
 
