@@ -155,54 +155,26 @@ const initializeLoad = () => {
                     setArtists(artists);
                 });
         })
-        .catch(error => console.error('Error loading data:', error))
+        .catch(error => console.error('Error loading data:', error));
 
-        d3.csv("data/measurements_full.csv", (d) => {
-            return {
-                spotify_id: d.spotify_id,
-                snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
-                daily_rank: d.daily_rank,
-                country: d.country,
-            };
-        })
-        .then((data) => {
-            setMeasurements(data);
-            console.log('set measurements');
-            initRankChart();
-            return fetch("data/alpha2ToCountryName.json");
-        })
-        .then((response) => response.json())
-        .then((alpha2ToCountryCode) => {
-            let countryOptions = [];
-            let optionObject;
-            console.log('use measurements');
-            let uniqueCountries = [...new Set(measurements.map((d) => d.country))]
-        
-            for (const countryCode of uniqueCountries) {
-            countryName = alpha2ToCountryCode[countryCode] ?? null;
-            if (countryName === null) {
-                continue;
-            }
-            optionObject = {
-                countryCode: countryCode,
-                countryName: countryName,
-                greyed: false,
-                pinned: false,
-            };
-        
-            countryOptions.push(optionObject);
-            }
-        
-            countryOptions.push({
-            countryCode: "",
-            countryName: globalName,
-            greyed: false,
-            pinned: true,
-            });
-        
-            setCountryOptions(countryOptions);
-        });
+    d3.csv("data/measurements_full.csv", (d) => {
+        return {
+            spotify_id: d.spotify_id,
+            snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
+            daily_rank: d.daily_rank,
+            country: d.country,
+        };
+    })
+    .then((data) => {
+        setMeasurements(data);
+        console.log('set measurements');
+        initRankChart();
+        return fetch("data/alpha2ToCountryName.json");
+    })
+    .then((response) => response.json())
+    .then((alpha2ToCountryCode) => {
 
+    });
 
     renderMusicSelection();
     renderGraphChart();
