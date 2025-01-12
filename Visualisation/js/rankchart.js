@@ -42,9 +42,9 @@ function updateCountryDropdownMenu() {
     }
   }
 
-  var notGreyed = countryOptions.filter((d) => d.greyed === false && d.pinned === false);
-  var greyed = countryOptions.filter((d) => d.greyed === true && d.pinned === false);
-  var pinned = countryOptions.filter((d) => d.pinned === true);
+  let notGreyed = countryOptions.filter((d) => d.greyed === false && d.pinned === false);
+  let greyed = countryOptions.filter((d) => d.greyed === true && d.pinned === false);
+  let pinned = countryOptions.filter((d) => d.pinned === true);
 
   setCountryOptions([
     ...pinned,
@@ -83,7 +83,7 @@ function updateRankChart() {
       selectedSongsIds.includes(entry.spotify_id) &&
       entry.country === selectedCountry
   );
-  var groupedSelectedMeasurements = d3.group(
+  let groupedSelectedMeasurements = d3.group(
     selectedSongMeasurements,
     (d) => d.spotify_id
   );
