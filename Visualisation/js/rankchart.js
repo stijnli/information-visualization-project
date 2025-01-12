@@ -23,17 +23,69 @@ function setCountryOptions(listOfCountryOptions) {
 
 // If a song is not in the graph for a day, line to 51
 function wrangleMeasurements(groupedSelectedMeasurements) {
-    // add start and end 55 as well!
     let previousEntry = null;
+
+    previousEntry = null;
     for (const songMeasurements of groupedSelectedMeasurements) {
-        let previousEntry = null;
-        for (const measurement of songMeasurements) {
+        newEntries = [];
+        previousEntry = null;
+        p = songMeasurements[1];
+        p.sort(function (a, b) {
+            // Turn your strings into dates, and then subtract them
+            // to get a value that is either negative, positive, or zero.
+            return a.snapshot_date - b.snapshot_date;
+        });
+        for (const measurement of p) {
             if (previousEntry === null) {
+                newEntries.push({
+                    spotify_id: measurement.spotify_id,
+                    snapshot_date: new Date(
+                        measurement.snapshot_date.getTime() - 86400000
+                    ),
+                    daily_rank: 55,
+                    country: measurement.country,
+                });
+
                 previousEntry = measurement;
                 continue;
             }
-            console.log(previousEntry.snapshot_date.getDate());
+            console.log(
+                (diff = Math.floor(
+                    (measurement.snapshot_date - previousEntry.snapshot_date) /
+                        (1000 * 60 * 60 * 24)
+                ))
+            );
             // get current and next
+            if (Math.abs(diff) > 1) {
+                console.log(measurement, previousEntry);
+                if (diff > 2) {
+                    newEntries.push({
+                        spotify_id: previousEntry.spotify_id,
+                        snapshot_date: new Date(
+                            previousEntry.snapshot_date.getTime() + 86400000
+                        ),
+                        daily_rank: 52,
+                        country: previousEntry.country,
+                    });
+                    newEntries.push({
+                        spotify_id: measurement.spotify_id,
+                        snapshot_date: new Date(
+                            measurement.snapshot_date.getTime() - 86400000
+                        ),
+                        daily_rank: 52,
+                        country: measurement.country,
+                    });
+                } else {
+                    newEntries.push({
+                        spotify_id: previousEntry.spotify_id,
+                        snapshot_date: new Date(
+                            previousEntry.snapshot_date.getTime() + 86400000
+                        ),
+                        daily_rank: 52,
+                        country: previousEntry.country,
+                    });
+                }
+            }
             // current.snapshot_date.getDate() - next.snapshot_date.getDate > 1:
             // current.snapshot_date.getDate() - next.snapshot_date.getDate > 2:
             // add to array {a,b,current.snapshotDate+1}
@@ -44,6 +96,13 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
             //sort
             previousEntry = measurement;
         }
+        console.log(newEntries);
+        songMeasurements[1].push(...newEntries);
+        songMeasurements[1].sort(function (a, b) {
+            // Turn your strings into dates, and then subtract them
+            // to get a value that is either negative, positive, or zero.
+            return a.snapshot_date - b.snapshot_date;
+        });
     }
 }
 
@@ -54,8 +113,16 @@ function initRankChart() {
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
+        // .attr("viewBox", "0 0 100 100")
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        // .append('clipPath')
+        // .attr('id', 'clipRect')
+        // .append('rect')
+        //     .attr('x', margin.left)
+        //     .attr('y', margin.top)
+        //     .attr('width', width + margin.left + margin.right)
+        //     .attr('height', height + margin.top + margin.bottom);
 }
 
 function initCountryOptions(alpha2ToCountryCode) {
@@ -168,12 +235,16 @@ function updateRankChart() {
             selectedSongsIds.includes(entry.spotify_id) &&
             entry.country === selectedCountry
     );
-    console.log(selectedSongMeasurements)
+    console.log(selectedSongMeasurements);
     let groupedSelectedMeasurements = d3.group(
         selectedSongMeasurements,
         (d) => d.spotify_id
     );
-    console.log(groupedSelectedMeasurements)
+    console.log(groupedSelectedMeasurements);
+
+    wrangleMeasurements(groupedSelectedMeasurements);
+
+    console.log(groupedSelectedMeasurements);
 
     // Scale the x-axis for time data
     const x = d3
@@ -205,6 +276,7 @@ function updateRankChart() {
                 .x((d) => x(d.snapshot_date))
                 .y((d) => y(+d.daily_rank))(d[1])
         )
+        .attr('clip-path', 'url("#clipRect")')
         .clone()
         .attr("stroke", "transparent")
         .attr("stroke-width", 15)
