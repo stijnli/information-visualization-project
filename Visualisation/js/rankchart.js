@@ -23,41 +23,38 @@ function setCountryOptions(listOfCountryOptions) {
 
 // If a song is not in the graph for a day, line to 51
 function wrangleMeasurements(groupedSelectedMeasurements) {
-    let previousEntry = null;
+    let previousEntry;
+    let newEntries;
+    let currentSongData;
 
-    previousEntry = null;
     for (const songMeasurements of groupedSelectedMeasurements) {
         newEntries = [];
         previousEntry = null;
-        p = songMeasurements[1];
-        p.sort(function (a, b) {
-            // Turn your strings into dates, and then subtract them
-            // to get a value that is either negative, positive, or zero.
+        currentSongData = songMeasurements[1];
+        currentSongData.sort(function (a, b) {
             return a.snapshot_date - b.snapshot_date;
         });
-        for (const measurement of p) {
+
+        for (const measurement of currentSongData) {
+            // the first iteration, add rise from bottom
             if (previousEntry === null) {
                 newEntries.push({
                     spotify_id: measurement.spotify_id,
                     snapshot_date: new Date(
                         measurement.snapshot_date.getTime() - 86400000
                     ),
-                    daily_rank: 55,
+                    daily_rank: 52,
                     country: measurement.country,
                 });
 
                 previousEntry = measurement;
                 continue;
             }
-            console.log(
-                (diff = Math.floor(
-                    (measurement.snapshot_date - previousEntry.snapshot_date) /
-                        (1000 * 60 * 60 * 24)
-                ))
-            );
-            // get current and next
-            if (Math.abs(diff) > 1) {
-                console.log(measurement, previousEntry);
+
+            // when two dates are not consecutive, add a fall/rise to/from bottom
+            if (diff > 1) {
+
+                // if there is a difference of more than 1 day between dates, add fall after previous point and rise before next
                 if (diff > 2) {
                     newEntries.push({
                         spotify_id: previousEntry.spotify_id,
@@ -76,6 +73,7 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                         country: measurement.country,
                     });
                 } else {
+                    // if there is a difference of exactly 1 day, add just 1 data point
                     newEntries.push({
                         spotify_id: previousEntry.spotify_id,
                         snapshot_date: new Date(
@@ -86,21 +84,12 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                     });
                 }
             }
-            // current.snapshot_date.getDate() - next.snapshot_date.getDate > 1:
-            // current.snapshot_date.getDate() - next.snapshot_date.getDate > 2:
-            // add to array {a,b,current.snapshotDate+1}
-            // add to array {a,b,next.snapshotDate-1}
-            // current.snapshot_date.getDate() - next.snapshot_date.getDate === 1:
-            // add to array {a,b,current.snapshotDate+1}
-            // add to songMeasurements
-            //sort
             previousEntry = measurement;
         }
-        console.log(newEntries);
+
+        // add the new data points and sort everything on date again
         songMeasurements[1].push(...newEntries);
         songMeasurements[1].sort(function (a, b) {
-            // Turn your strings into dates, and then subtract them
-            // to get a value that is either negative, positive, or zero.
             return a.snapshot_date - b.snapshot_date;
         });
     }
@@ -116,13 +105,14 @@ function initRankChart() {
         // .attr("viewBox", "0 0 100 100")
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
-        // .append('clipPath')
-        // .attr('id', 'clipRect')
-        // .append('rect')
-        //     .attr('x', margin.left)
-        //     .attr('y', margin.top)
-        //     .attr('width', width + margin.left + margin.right)
-        //     .attr('height', height + margin.top + margin.bottom);
+
+    svg.append('clipPath')
+        .attr('id', 'clipRect')
+        .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', width)
+            .attr('height', height);
 }
 
 function initCountryOptions(alpha2ToCountryCode) {
@@ -226,7 +216,8 @@ function updateCountryDropdownMenu() {
 
 function updateRankChart() {
     // Remove all lines in the graph
-    svg.selectAll("*").remove();
+    svg.selectAll("g").remove();
+    svg.selectAll("path").remove();
 
     // Get ranking data from selected songs and group by spotify id
     let selectedSongsIds = selectedSongs.map((song) => song.id);
@@ -257,7 +248,7 @@ function updateRankChart() {
         .call(d3.axisBottom(x));
 
     // Scale the y-axis for ranking 1-50
-    const y = d3.scaleLinear().domain([51, 1]).range([height, 0]);
+    const y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
     yAxis = svg.append("g").call(d3.axisLeft(y));
 
     // Draw the ranking lines
