@@ -5,8 +5,8 @@ let countryOptions = [];
 const globalName = "Global";
 
 // set the dimensions and margins of the graph
-const margin = { top: 10, right: 30, bottom: 30, left: 60 };
-const width = 500 - margin.left - margin.right;
+const margin = { top: 10, right: 30, bottom: 70, left: 60 };
+const width = 450 - margin.left - margin.right;
 const height = 450 - margin.top - margin.bottom;
 
 function setMeasurements(data) {
@@ -50,6 +50,9 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                 previousEntry = measurement;
                 continue;
             }
+
+            // calculate the difference between the two data points
+            diff = Math.floor((measurement.snapshot_date - previousEntry.snapshot_date) / (1000 * 60 * 60 * 24));
 
             // when two dates are not consecutive, add a fall/rise to/from bottom
             if (diff > 1) {
@@ -102,7 +105,6 @@ function initRankChart() {
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        // .attr("viewBox", "0 0 100 100")
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -241,15 +243,36 @@ function updateRankChart() {
     const x = d3
         .scaleTime()
         .domain(d3.extent(selectedSongMeasurements, (d) => d.snapshot_date))
+        .nice()
         .range([0, width]);
     xAxis = svg
         .append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
 
+    xAxis.selectAll("text")  
+    .style("text-anchor", "end")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-65)")
+
+    xAxis.append('text')
+    .attr('class', 'axis-label')
+    .text('Time')
+    .attr('x', margin.left + (width - margin.left - margin.right) / 2)
+    .attr('y', 55) // Relative to the x axis.
+
     // Scale the y-axis for ranking 1-50
     const y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
-    yAxis = svg.append("g").call(d3.axisLeft(y));
+    yAxis = svg
+    .append("g")
+    .call(d3.axisLeft(y))
+    .append('text')
+    .attr('class', 'axis-label')
+    .text('Ranking in the Top 50')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -(margin.top + (height - margin.top - margin.bottom) / 2))
+    .attr('y', -40) // Relative to the y axis.
 
     // Draw the ranking lines
     svg.selectAll(".line")
