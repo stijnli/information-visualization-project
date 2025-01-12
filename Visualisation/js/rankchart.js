@@ -1,17 +1,24 @@
+
+let svg;
+let measurements = [];
+let selectedCountry = "";
+let countryOptions = [];
 const globalName = "Global";
 
-let measurements = [];
-const setMeasurements = (data) => {
+// set the dimensions and margins of the graph
+const margin = { top: 10, right: 30, bottom: 30, left: 60 },
+  width = 500 - margin.left - margin.right,
+  height = 450 - margin.top - margin.bottom;
+
+function setMeasurements(data) {
   measurements = data;
 };
 
-let selectedCountry = "";
-const setSelectedCountry = (countryCode) => {
+function setSelectedCountry(countryCode) {
   selectedCountry = countryCode;
 };
 
-let countryOptions = [];
-const setCountryOptions = (listOfCountryOptions) => {
+function setCountryOptions(listOfCountryOptions) {
   countryOptions = listOfCountryOptions;
 };
 
@@ -64,19 +71,19 @@ function selectCountry(countryCode) {
   renderRankChart();
 }
 
-// set the dimensions and margins of the graph
-const margin = { top: 10, right: 30, bottom: 30, left: 60 },
-  width = 500 - margin.left - margin.right,
-  height = 450 - margin.top - margin.bottom;
+function initRankChart() {
+  console.log('draw image');
 
-// append the svg object to the body of the page
-const svg = d3
-  .select("#rank_chart")
-  .append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+  // append the svg object to the body of the page
+  svg = d3
+    .select("#rank_chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+}
 
 function sortCountryOptionsAlphabetically(arrayOfOptions) {
   return arrayOfOptions.sort((a, b) =>
@@ -137,48 +144,48 @@ function renderRankChart() {
     .attr("onmouseout", "setCurrentHoveredSongId(undefined)");
 }
 
-// Read the CSV and format it for D3
-d3.csv("data/measurements_full.csv", (d) => {
-  return {
-    spotify_id: d.spotify_id,
-    snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
-    daily_rank: d.daily_rank,
-    country: d.country,
-  };
-})
-  .then((data) => {
-    setMeasurements(data);
+// // Read the CSV and format it for D3
+// d3.csv("data/measurements_full.csv", (d) => {
+//   return {
+//     spotify_id: d.spotify_id,
+//     snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
+//     daily_rank: d.daily_rank,
+//     country: d.country,
+//   };
+// })
+//   .then((data) => {
+//     setMeasurements(data);
 
-    return fetch("data/alpha2ToCountryName.json");
-  })
-  .then((response) => response.json())
-  .then((alpha2ToCountryCode) => {
-    let countryOptions = [];
-    let optionObject;
+//     return fetch("data/alpha2ToCountryName.json");
+//   })
+//   .then((response) => response.json())
+//   .then((alpha2ToCountryCode) => {
+//     let countryOptions = [];
+//     let optionObject;
 
-    let uniqueCountries = [...new Set(measurements.map((d) => d.country))]
+//     let uniqueCountries = [...new Set(measurements.map((d) => d.country))]
 
-    for (const countryCode of uniqueCountries) {
-      countryName = alpha2ToCountryCode[countryCode] ?? null;
-      if (countryName === null) {
-        continue;
-      }
-      optionObject = {
-        countryCode: countryCode,
-        countryName: countryName,
-        greyed: false,
-        pinned: false,
-      };
+//     for (const countryCode of uniqueCountries) {
+//       countryName = alpha2ToCountryCode[countryCode] ?? null;
+//       if (countryName === null) {
+//         continue;
+//       }
+//       optionObject = {
+//         countryCode: countryCode,
+//         countryName: countryName,
+//         greyed: false,
+//         pinned: false,
+//       };
 
-      countryOptions.push(optionObject);
-    }
+//       countryOptions.push(optionObject);
+//     }
 
-    countryOptions.push({
-      countryCode: "",
-      countryName: globalName,
-      greyed: false,
-      pinned: true,
-    });
+//     countryOptions.push({
+//       countryCode: "",
+//       countryName: globalName,
+//       greyed: false,
+//       pinned: true,
+//     });
 
-    setCountryOptions(countryOptions);
-  });
+//     setCountryOptions(countryOptions);
+//   });

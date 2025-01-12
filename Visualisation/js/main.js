@@ -32,7 +32,6 @@ const setCurrentHoveredSongId = (newSongId) => {
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
         if(oldSongIsSelected) {
         document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
-        document.getElementById(`rankchart-'${currentHoveredSongId}'`).style.opacity = 0.5;
         }
 
         // Change svg node stroke
@@ -51,7 +50,6 @@ const setCurrentHoveredSongId = (newSongId) => {
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
-        document.getElementById(`rankchart-'${newSongId}'`).style.opacity = 1;
         
         // Change svg node stroke
         graphNode = document.getElementById("graphNode-" + newSongId)
@@ -126,7 +124,8 @@ const initializeLoad = () => {
             });
             albums = [...albumsMap.values()];
 
-        }).then(() => {
+        })
+        .then(() => {
             fetch('data/artists.json')
                 .then(response => response.json())
                 .then(artists => {
@@ -156,8 +155,53 @@ const initializeLoad = () => {
                     setArtists(artists);
                 });
         })
-        .catch(error => console.error('Error loading data:', error));
+        .catch(error => console.error('Error loading data:', error))
 
+        d3.csv("data/measurements_full.csv", (d) => {
+            return {
+                spotify_id: d.spotify_id,
+                snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
+                daily_rank: d.daily_rank,
+                country: d.country,
+            };
+        })
+        .then((data) => {
+            setMeasurements(data);
+            console.log('set measurements');
+            initRankChart();
+            return fetch("data/alpha2ToCountryName.json");
+        })
+        .then((response) => response.json())
+        .then((alpha2ToCountryCode) => {
+            let countryOptions = [];
+            let optionObject;
+            console.log('use measurements');
+            let uniqueCountries = [...new Set(measurements.map((d) => d.country))]
+        
+            for (const countryCode of uniqueCountries) {
+            countryName = alpha2ToCountryCode[countryCode] ?? null;
+            if (countryName === null) {
+                continue;
+            }
+            optionObject = {
+                countryCode: countryCode,
+                countryName: countryName,
+                greyed: false,
+                pinned: false,
+            };
+        
+            countryOptions.push(optionObject);
+            }
+        
+            countryOptions.push({
+            countryCode: "",
+            countryName: globalName,
+            greyed: false,
+            pinned: true,
+            });
+        
+            setCountryOptions(countryOptions);
+        });
 
 
     renderMusicSelection();
