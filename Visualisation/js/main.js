@@ -20,7 +20,7 @@ const setSelectedSongs = (newSelectedSongs) => {
     // Execute rerenders
     renderMusicSelection();
     renderGraphChart();
-    renderRankChart();
+    updateRankChart();
     updateCountryDropdownMenu();
 };
 

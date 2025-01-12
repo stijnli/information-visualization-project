@@ -6,21 +6,28 @@ let countryOptions = [];
 const globalName = "Global";
 
 // set the dimensions and margins of the graph
-const margin = { top: 10, right: 30, bottom: 30, left: 60 },
-  width = 500 - margin.left - margin.right,
-  height = 450 - margin.top - margin.bottom;
+const margin = { top: 10, right: 30, bottom: 30, left: 60 };
+const width = 500 - margin.left - margin.right;
+const height = 450 - margin.top - margin.bottom;
 
-function setMeasurements(data) {
-  measurements = data;
-};
+function initRankChart() {
+  console.log('draw image');
 
-function setSelectedCountry(countryCode) {
-  selectedCountry = countryCode;
-};
+  // append the svg object to the body of the page
+  svg = d3
+    .select("#rank_chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+}
 
-function setCountryOptions(listOfCountryOptions) {
-  countryOptions = listOfCountryOptions;
-};
+function selectCountry(countryCode) {
+  setSelectedCountry(countryCode);
+  updateCountryDropdownMenu();
+  updateRankChart();
+}
 
 function updateCountryDropdownMenu() {
   let selectedSongsIds = selectedSongs.map((song) => song.id);
@@ -65,33 +72,7 @@ function updateCountryDropdownMenu() {
   countrySelect.replaceChildren(...optionsList);
 }
 
-function selectCountry(countryCode) {
-  setSelectedCountry(countryCode);
-  updateCountryDropdownMenu();
-  renderRankChart();
-}
-
-function initRankChart() {
-  console.log('draw image');
-
-  // append the svg object to the body of the page
-  svg = d3
-    .select("#rank_chart")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-}
-
-function sortCountryOptionsAlphabetically(arrayOfOptions) {
-  return arrayOfOptions.sort((a, b) =>
-    a.countryName.localeCompare(b.countryName, "en", { sensitivity: "base" })
-  );
-}
-
-function renderRankChart() {
+function updateRankChart() {
   // Remove all lines in the graph
   svg.selectAll("*").remove();
 
@@ -144,48 +125,20 @@ function renderRankChart() {
     .attr("onmouseout", "setCurrentHoveredSongId(undefined)");
 }
 
-// // Read the CSV and format it for D3
-// d3.csv("data/measurements_full.csv", (d) => {
-//   return {
-//     spotify_id: d.spotify_id,
-//     snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
-//     daily_rank: d.daily_rank,
-//     country: d.country,
-//   };
-// })
-//   .then((data) => {
-//     setMeasurements(data);
+function sortCountryOptionsAlphabetically(arrayOfOptions) {
+  return arrayOfOptions.sort((a, b) =>
+    a.countryName.localeCompare(b.countryName, "en", { sensitivity: "base" })
+  );
+}
 
-//     return fetch("data/alpha2ToCountryName.json");
-//   })
-//   .then((response) => response.json())
-//   .then((alpha2ToCountryCode) => {
-//     let countryOptions = [];
-//     let optionObject;
+function setMeasurements(data) {
+  measurements = data;
+};
 
-//     let uniqueCountries = [...new Set(measurements.map((d) => d.country))]
+function setSelectedCountry(countryCode) {
+  selectedCountry = countryCode;
+};
 
-//     for (const countryCode of uniqueCountries) {
-//       countryName = alpha2ToCountryCode[countryCode] ?? null;
-//       if (countryName === null) {
-//         continue;
-//       }
-//       optionObject = {
-//         countryCode: countryCode,
-//         countryName: countryName,
-//         greyed: false,
-//         pinned: false,
-//       };
-
-//       countryOptions.push(optionObject);
-//     }
-
-//     countryOptions.push({
-//       countryCode: "",
-//       countryName: globalName,
-//       greyed: false,
-//       pinned: true,
-//     });
-
-//     setCountryOptions(countryOptions);
-//   });
+function setCountryOptions(listOfCountryOptions) {
+  countryOptions = listOfCountryOptions;
+};
