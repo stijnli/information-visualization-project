@@ -21,6 +21,32 @@ function setCountryOptions(listOfCountryOptions) {
     countryOptions = listOfCountryOptions;
 }
 
+// If a song is not in the graph for a day, line to 51
+function wrangleMeasurements(groupedSelectedMeasurements) {
+    // add start and end 55 as well!
+    let previousEntry = null;
+    for (const songMeasurements of groupedSelectedMeasurements) {
+        let previousEntry = null;
+        for (const measurement of songMeasurements) {
+            if (previousEntry === null) {
+                previousEntry = measurement;
+                continue;
+            }
+            console.log(previousEntry.snapshot_date.getDate());
+            // get current and next
+            // current.snapshot_date.getDate() - next.snapshot_date.getDate > 1:
+            // current.snapshot_date.getDate() - next.snapshot_date.getDate > 2:
+            // add to array {a,b,current.snapshotDate+1}
+            // add to array {a,b,next.snapshotDate-1}
+            // current.snapshot_date.getDate() - next.snapshot_date.getDate === 1:
+            // add to array {a,b,current.snapshotDate+1}
+            // add to songMeasurements
+            //sort
+            previousEntry = measurement;
+        }
+    }
+}
+
 function initRankChart() {
     // append the svg object to the body of the page
     svg = d3
@@ -142,10 +168,12 @@ function updateRankChart() {
             selectedSongsIds.includes(entry.spotify_id) &&
             entry.country === selectedCountry
     );
+    console.log(selectedSongMeasurements)
     let groupedSelectedMeasurements = d3.group(
         selectedSongMeasurements,
         (d) => d.spotify_id
     );
+    console.log(groupedSelectedMeasurements)
 
     // Scale the x-axis for time data
     const x = d3
