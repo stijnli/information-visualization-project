@@ -6,7 +6,7 @@ const globalName = "Global";
 
 // set the dimensions and margins of the graph
 const margin = { top: 10, right: 30, bottom: 70, left: 60 };
-const width = 450 - margin.left - margin.right;
+const width = 550 - margin.left - margin.right;
 const height = 450 - margin.top - margin.bottom;
 
 function setMeasurements(data) {
