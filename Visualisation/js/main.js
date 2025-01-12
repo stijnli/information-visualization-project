@@ -167,17 +167,14 @@ const initializeLoad = () => {
     })
     .then((data) => {
         setMeasurements(data);
-        console.log('set measurements');
-        initRankChart();
         return fetch("data/alpha2ToCountryName.json");
     })
     .then((response) => response.json())
-    .then((alpha2ToCountryCode) => {
-
-    });
+    .then((alpha2ToCountryCode) => initCountryOptions(alpha2ToCountryCode));
 
     renderMusicSelection();
     renderGraphChart();
+    initRankChart();
 };
 
 
