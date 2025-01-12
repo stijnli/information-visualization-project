@@ -36,6 +36,9 @@ const setCurrentHoveredSongId = (newSongId) => {
 
         // Change svg node stroke
         document.getElementById("graphNode-" + currentHoveredSongId).style.stroke = oldHoveredSongOutlineColor
+        if (document.getElementById(`rankchart-${currentHoveredSongId}`) !== null) {
+            document.getElementById(`rankchart-${currentHoveredSongId}`).style.opacity = 0.6;
+        }
     }
 
     if (newSongId === undefined) {
@@ -50,7 +53,9 @@ const setCurrentHoveredSongId = (newSongId) => {
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
-        
+        if (document.getElementById(`rankchart-${newSongId}`) !== null) {
+            document.getElementById(`rankchart-${newSongId}`).style.opacity = 1;
+        }
         // Change svg node stroke
         graphNode = document.getElementById("graphNode-" + newSongId)
         oldHoveredSongOutlineColor = graphNode.style.stroke

@@ -22,8 +22,6 @@ function setCountryOptions(listOfCountryOptions) {
 }
 
 function initRankChart() {
-    console.log("draw image");
-
     // append the svg object to the body of the page
     svg = d3
         .select("#rank_chart")
@@ -170,8 +168,9 @@ function updateRankChart() {
         .attr("fill", "none")
         .attr("stroke", (d) => getSongColor(d[0]))
         .attr("stroke-width", 3)
-        .attr("opacity", 0.5)
-        .attr("id", (d) => `rankchart-'${d[0]}'`)
+        .attr("opacity", 0.6)
+        .attr("border", 0)
+        .attr("id", (d) => `rankchart-${d[0]}`)
         .attr("d", (d) =>
             d3
                 .line()
