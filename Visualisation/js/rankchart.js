@@ -2,7 +2,10 @@ let svg;
 let measurements = [];
 let selectedCountry = "";
 let countryOptions = [];
+
 const globalName = "Global";
+const oneDay = 86400000;
+const noDataMessage = 'No Ranking data found for selected songs. Select different songs or choose a different country in the dropdown below.'
 
 // set the dimensions and margins of the graph
 const margin = { top: 10, right: 30, bottom: 70, left: 60 };
@@ -41,7 +44,7 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                 newEntries.push({
                     spotify_id: measurement.spotify_id,
                     snapshot_date: new Date(
-                        measurement.snapshot_date.getTime() - 86400000
+                        measurement.snapshot_date.getTime() - oneDay
                     ),
                     daily_rank: 52,
                     country: measurement.country,
@@ -62,7 +65,7 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                     newEntries.push({
                         spotify_id: previousEntry.spotify_id,
                         snapshot_date: new Date(
-                            previousEntry.snapshot_date.getTime() + 86400000
+                            previousEntry.snapshot_date.getTime() + oneDay
                         ),
                         daily_rank: 52,
                         country: previousEntry.country,
@@ -70,7 +73,7 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                     newEntries.push({
                         spotify_id: measurement.spotify_id,
                         snapshot_date: new Date(
-                            measurement.snapshot_date.getTime() - 86400000
+                            measurement.snapshot_date.getTime() - oneDay
                         ),
                         daily_rank: 52,
                         country: measurement.country,
@@ -80,7 +83,7 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
                     newEntries.push({
                         spotify_id: previousEntry.spotify_id,
                         snapshot_date: new Date(
-                            previousEntry.snapshot_date.getTime() + 86400000
+                            previousEntry.snapshot_date.getTime() + oneDay
                         ),
                         daily_rank: 52,
                         country: previousEntry.country,
@@ -105,6 +108,7 @@ function initRankChart() {
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
+        .attr("id", "rankChartSVG")
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -228,21 +232,36 @@ function updateRankChart() {
             selectedSongsIds.includes(entry.spotify_id) &&
             entry.country === selectedCountry
     );
-    console.log(selectedSongMeasurements);
     let groupedSelectedMeasurements = d3.group(
         selectedSongMeasurements,
         (d) => d.spotify_id
     );
-    console.log(groupedSelectedMeasurements);
 
     wrangleMeasurements(groupedSelectedMeasurements);
 
-    console.log(groupedSelectedMeasurements);
+    // render a message if no data is displayed in the chart
+    const elem = d3.select("#rankChartCol");
+    const svgElem = d3.select("#rankChartSVG");
+    elem.select("#rankChartNoDataAlert").remove();
+
+    if (groupedSelectedMeasurements.size === 0) {
+        svgElem.style('display', 'none')
+
+        elem.insert('div', "#countrySelect")
+        .attr('class', 'alert alert-warning')
+        .attr('id', 'rankChartNoDataAlert')
+        .attr('role', 'alert')
+        .text(noDataMessage);
+        return;
+    }
+    svgElem.style('display', null)
 
     // Scale the x-axis for time data
+    const xExtend = d3.extent(selectedSongMeasurements, (d) => d.snapshot_date)
+
     const x = d3
         .scaleTime()
-        .domain(d3.extent(selectedSongMeasurements, (d) => d.snapshot_date))
+        .domain([new Date(xExtend[0].getTime() - oneDay), xExtend[1]])
         .nice()
         .range([0, width]);
     xAxis = svg
