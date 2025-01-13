@@ -30,7 +30,7 @@ class GraphChart {
         this.simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(d => d.id).strength(0.25))
             .force("charge", d3.forceManyBody().strength(-40))
-            .force("center", d3.forceCenter(this.width / 2, this.height / 2).strength(1))
+            .force("center", d3.forceCenter(this.width / 2, this.height / 2).strength(0.05))
             .force("x", d3.forceX(this.width / 2).strength(0.05))
             .force("y", d3.forceY(this.height / 2).strength(0.05))
             .force("collide", d3.forceCollide(10).strength(0.5))
@@ -149,13 +149,23 @@ class GraphChart {
         );
 
 
-        // Update nodes with locations of the old nodes
+        // Update nodes with locations of the old nodes, try placing new nodes near old nodes so that the graph doesn't jump around
         nodes = nodes.map(node => {
             const oldNode = this.oldNodes.find(oldNode => oldNode.id === node.id);
             if (oldNode) {
                 return { ...node, x: oldNode.x, y: oldNode.y };
             }
-            return node;
+            let linkNearby = links.find(link => (link.source === node.id || link.target === node.id) && this.oldNodes.some((oldNode => (oldNode.id === link.source || oldNode.id === link.target) && (oldNode.x && oldNode.y))));
+
+            const nodeNearby = linkNearby ? this.oldNodes.find(oldNode => oldNode.id === (linkNearby.source === node.id ? linkNearby.target : linkNearby.source)) : undefined;
+
+            if (nodeNearby) {
+                console.log(nodeNearby);
+                return { ...node, x: nodeNearby.x + Math.random() * 50 - 25, y: nodeNearby.y + Math.random() * 50 - 25 };
+            }
+            else {
+                return { ...node, x: this.width / 2, y: this.height / 2 };
+            }
         });
 
         this.oldNodes = nodes;
