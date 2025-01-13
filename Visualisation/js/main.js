@@ -26,7 +26,7 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
-    renderGraphChart();
+    graphChart.updateVis();
 };
 
 let currentHoveredSongId = undefined;
@@ -35,8 +35,8 @@ const setCurrentHoveredSongId = (newSongId) => {
     const oldSongIsSelected = selectedSongs.some(song => song.id === currentHoveredSongId);
     // Update the border of the song image
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
-        if(oldSongIsSelected) {
-        document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
+        if (oldSongIsSelected) {
+            document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
         }
 
         // Change svg node stroke
@@ -107,12 +107,13 @@ const addSong = (songId) => {
     setSelectedSongs([...selectedSongs, newSong]);
 };
 
+
+let graphChart = undefined;
 const initializeLoad = () => {
     // Define data loading, try not to load the data multiple times.
     fetch('data/songs.json')
         .then(response => response.json())
         .then(songs => {
-            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
             setSongs(songs);
 
             let albumsMap = new Map();
@@ -131,7 +132,11 @@ const initializeLoad = () => {
                 .then(artists => {
                     songsPerArtist = new Map();
                     albumsPerArtist = new Map();
+                    const allAlbums = new Map();
                     songs.forEach(song => {
+                        if (!allAlbums.has(song.album.id)) {
+                            allAlbums.set(song.album.id, song.album);
+                        }
                         song.artists.forEach(artist => {
                             if (!songsPerArtist.has(artist.id)) {
                                 songsPerArtist.set(artist.id, new Set());
@@ -152,15 +157,20 @@ const initializeLoad = () => {
                         artist.songs = [...songsPerArtist.get(artist.id) || new Set()];
                         artist.albums = [...albumsPerArtist.get(artist.id) || new Set()];
                     });
+                    const albums = [...allAlbums.values()];
                     setArtists(artists);
+                    graphChart = new GraphChart(songs, artists, albums, selectedSongs);
+                    graphChart.initVis();
+                    setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
                 });
+
+
         })
         .catch(error => console.error('Error loading data:', error));
 
 
 
     renderMusicSelection();
-    renderGraphChart();
 };
 
 
