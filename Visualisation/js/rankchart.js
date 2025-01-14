@@ -1,4 +1,6 @@
 let svg;
+let g;
+let focus;
 let measurements = [];
 let selectedCountry = "";
 let countryOptions = [];
@@ -108,17 +110,33 @@ function initRankChart() {
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .attr("id", "rankChartSVG")
-        .append("g")
+        .attr("id", "rankChartSVG");
+
+    g = svg.append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    svg.append('clipPath')
+    g.append('clipPath')
         .attr('id', 'clipRect')
         .append('rect')
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', width)
             .attr('height', height);
+
+    focus = svg.append("g")
+    .attr("class", "focus")
+    .attr("transform", "translate(-100,-100)");
+
+    focus.append("circle")
+    .attr("r", 7)
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("stroke-width", 2);
+
+    focus.append("text")
+    .attr("x", 9)
+    .attr("dy", ".35em");
+      
 }
 
 function initCountryOptions(alpha2ToCountryCode) {
@@ -222,8 +240,8 @@ function updateCountryDropdownMenu() {
 
 function updateRankChart() {
     // Remove all lines in the graph
-    svg.selectAll("g").remove();
-    svg.selectAll("path").remove();
+    g.selectAll("g").remove();
+    g.selectAll("path").remove();
 
     // Get ranking data from selected songs and group by spotify id
     let selectedSongsIds = selectedSongs.map((song) => song.id);
@@ -264,7 +282,7 @@ function updateRankChart() {
         .domain([new Date(xExtend[0].getTime() - oneDay), xExtend[1]])
         .nice()
         .range([0, width]);
-    xAxis = svg
+    xAxis = g
         .append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
@@ -283,7 +301,7 @@ function updateRankChart() {
 
     // Scale the y-axis for ranking 1-50
     const y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
-    yAxis = svg
+    yAxis = g
     .append("g")
     .call(d3.axisLeft(y))
     .append('text')
@@ -294,7 +312,7 @@ function updateRankChart() {
     .attr('y', -40) // Relative to the y axis.
 
     // Draw the ranking lines
-    svg.selectAll(".line")
+    g.selectAll(".line")
         .data(groupedSelectedMeasurements)
         .join("path")
         .attr("fill", "none")
@@ -314,7 +332,21 @@ function updateRankChart() {
         .attr("stroke", "transparent")
         .attr("stroke-width", 15)
         .attr("onmouseover", (d) => `setCurrentHoveredSongId('${d[0]}')`)
-        .attr("onmouseout", "setCurrentHoveredSongId(undefined)");
+        .attr("onmouseout", "setCurrentHoveredSongId(undefined)")
+        .on('pointermove', (event, d) => pointerMoved(event, d))
+        .on('pointerleave', () => pointerLeft());
+
+        function pointerMoved(event, d) {
+            const [xm, ym] = d3.pointer(event);
+            const i = d3.least(d[1], i => Math.hypot(x(i.snapshot_date) - xm, y(+i.daily_rank) - ym)); // closest point
+
+            focus.lower().attr("transform", "translate(" + (x(i.snapshot_date) + margin.left) + "," + (y(i.daily_rank) + margin.top) + ")");
+            focus.raise().select("text").text('hi');
+          }
+        
+          function pointerLeft() {
+            focus.attr("transform", "translate(-100,-100)");
+          }
 }
 
 function sortCountryOptionsAlphabetically(arrayOfOptions) {
