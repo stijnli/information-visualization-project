@@ -23,7 +23,7 @@
 	<!-- own js files -->
 	<script src="js/menu.js"></script>
 	<script src="js/graph_chart.js"></script>
-
+	<script src="js/rankchart.js"></script>
 
 	<script src="js/main.js"></script>
 	<script>
@@ -67,9 +67,6 @@
 			<div class="col-md-9">
 				<div class="row" style="height: 500px;">
 					<div class="col-12">
-						<h2>
-							Graph chart
-						</h2>
 						<p>
 							Below, you can see a graph chart that allows you to explore the relationship between
 							different songs, artists, albums and genres. Left-clicking on nodes opens and closes their
@@ -79,10 +76,12 @@
 					</div>
 				</div>
 				<div class="row" style="height: 450px;">
-					<div class="col-6">
-						<h2>
-							Linechart can be placed here
-						</h2>
+					<div class="col-6" id="rankChartCol">
+						        <p>
+                                    In the rank chart, you can select see the ranking in the top 50, globally or in a specific country
+                                </p>
+						        <select style="float:right;" id="countrySelect" onchange="selectCountry(this.value)"></select>
+						<div id="rank_chart"></div>
 					</div>
 					<div class="col-6">
 						<h2>
