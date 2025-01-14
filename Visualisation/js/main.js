@@ -1,25 +1,32 @@
 // Define config variables
 const config = {
-    songColors: ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D', '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC', '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399', '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933', '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'],
+    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00",  "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
     maxSelectedSongs: 10
 }
 
 // Define variables (all variables have a getter and setter function so that related functions can be called when the value is changed). 
 // IMPORTANT: Never change the value of a variable directly, always use the setter function.
 
+const colorQueue = [...config.songColors];
+
 let selectedSongs = [];
 const setSelectedSongs = (newSelectedSongs) => {
-    // Reassign colors
-    newSelectedSongs.forEach((song, index) => {
-        song.color = config.songColors[index % config.songColors.length];
-    }
-    );
+    // Check which songs have been removed and add their colors back to the queue
+    const removedSongs = selectedSongs.filter(song => !newSelectedSongs.some(newSong => newSong.id === song.id));
+    removedSongs.forEach(song => colorQueue.push(song.color));
+
+    // Assign colors to the new songs
+    const addedSongs = newSelectedSongs.filter(song => !selectedSongs.some(oldSong => oldSong.id === song.id));
+    addedSongs.forEach(song => {
+        song.color = colorQueue.pop();
+    });
+
 
     selectedSongs = newSelectedSongs;
 
     // Execute rerenders
     renderMusicSelection();
-    renderGraphChart();
+    graphChart.updateVis();
     updateRankChart();
     updateCountryDropdownMenu();
 };
@@ -30,8 +37,8 @@ const setCurrentHoveredSongId = (newSongId) => {
     const oldSongIsSelected = selectedSongs.some(song => song.id === currentHoveredSongId);
     // Update the border of the song image
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
-        if(oldSongIsSelected) {
-        document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
+        if (oldSongIsSelected) {
+            document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
         }
 
         // Change svg node stroke
@@ -116,7 +123,6 @@ const initializeLoad = () => {
     fetch('data/songs.json')
         .then(response => response.json())
         .then(songs => {
-            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
             setSongs(songs);
 
             let albumsMap = new Map();
@@ -136,7 +142,11 @@ const initializeLoad = () => {
                 .then(artists => {
                     songsPerArtist = new Map();
                     albumsPerArtist = new Map();
+                    const allAlbums = new Map();
                     songs.forEach(song => {
+                        if (!allAlbums.has(song.album.id)) {
+                            allAlbums.set(song.album.id, song.album);
+                        }
                         song.artists.forEach(artist => {
                             if (!songsPerArtist.has(artist.id)) {
                                 songsPerArtist.set(artist.id, new Set());
@@ -157,8 +167,14 @@ const initializeLoad = () => {
                         artist.songs = [...songsPerArtist.get(artist.id) || new Set()];
                         artist.albums = [...albumsPerArtist.get(artist.id) || new Set()];
                     });
+                    const albums = [...allAlbums.values()];
                     setArtists(artists);
+                    graphChart = new GraphChart(songs, artists, albums, selectedSongs);
+                    graphChart.initVis();
+                    setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
                 });
+
+
         })
         .catch(error => console.error('Error loading data:', error));
 
@@ -178,7 +194,6 @@ const initializeLoad = () => {
     .then((alpha2ToCountryCode) => initCountryOptions(alpha2ToCountryCode));
 
     renderMusicSelection();
-    renderGraphChart();
     initRankChart();
 };
 
