@@ -25,6 +25,27 @@ function prepDataTable(data) {
     return Rows;
 }
 
+function sortTable(data, keyToAttribute, sortDirection){
+  data.sort((a, b) => {
+        if (typeof a[keyToAttribute] === "string") {
+            // Compare strings
+            if (sortDirection === "asc") {
+                return a[keyToAttribute].localeCompare(b[keyToAttribute]);
+            } else {
+                return b[keyToAttribute].localeCompare(a[keyToAttribute]);
+            }
+        } else {
+            // Compare numbers
+            if (sortDirection === "asc") {
+                return a[keyToAttribute] - b[keyToAttribute];
+            } else {
+                return b[keyToAttribute] - a[keyToAttribute];
+            }
+        }
+    });
+    return data;
+}
+
 // croping the song title to fit in the element
 function cropText(textElement, text, widthElement) {
     // Append a temporary text element to the SVG to measure its length
@@ -56,17 +77,16 @@ function renderLengthSong(svgObject, songTitle, songArtists){
         .attr("visibility", "hidden")
         .text(songArtists);
     let renderLength
-if (tempTitle.node().getComputedTextLength() < tempArtists.node().getComputedTextLength()) {
-    renderLength = tempArtists.node().getComputedTextLength()
-}
-else {
-    renderLength = tempTitle.node().getComputedTextLength()
-}
-// Remove the temporary element after measuring
-tempTitle.remove();
-tempArtists.remove();
-console.log("renderlength",renderLength);
-return renderLength;
+    if (tempTitle.node().getComputedTextLength() < tempArtists.node().getComputedTextLength()) {
+        renderLength = tempArtists.node().getComputedTextLength()
+    }
+    else {
+        renderLength = tempTitle.node().getComputedTextLength()
+    }
+    // Remove the temporary element after measuring
+    tempTitle.remove();
+    tempArtists.remove();
+    return renderLength;
 }
 
 
@@ -105,6 +125,7 @@ function makeScrolingSongTitle(svgObject, data, widthScroling, i) {
         .attr("dur", renderLengthSong(svgObject, data[i][1], data[i][2] + widthScroling) /25 + "s")
         .attr("repeatCount", "indefinite"); // Infinite scrolling
 }
+let sortedData = [];
 
 // Margin object with properties for the four directions
 const margin = {
@@ -120,10 +141,12 @@ let height = 450 - margin.top - margin.bottom;
 
 const widthSong = 150
 const heightElement = height / 11
+const heightSortButton = 15
 
 const renderTable = () => {
     let data = selectedSongs
     let tableData = prepDataTable(data);
+    let sortedData = tableData
 
     // Definition of the luminance scales which are then stored in "attributes" as "scale"
     let colorScaleDanceability = d3.scaleLinear()
@@ -231,8 +254,40 @@ const renderTable = () => {
         .attr("class", "tableHeadline")
         .attr("id", "songnameHeadline")
         .attr("x", widthSong / 2)
-        .attr("y", heightElement / 2)
+        .attr("y", (heightElement - heightSortButton) / 2)
         .attr("dominant-baseline", "central");
+    svgTable.append("rect")//sort button up song
+        .attr("id", "songup")
+        .classed("sort-button", true)
+        .attr("x", 0)
+        .attr("y", heightElement-heightSortButton)
+        .attr("width", widthSong/2)
+        .attr("height", heightSortButton)
+        .attr("fill", "white")
+        .attr("stroke-width", 2)
+        .attr("stroke", "black")
+        .on("click", function(){
+            svgTable.selectAll(".sort-button").attr("fill", "white");
+            d3.select("#songup").attr("fill", "black");
+            let sortedData = sortTable(tableData, 1, "asc");
+            console.log("sorted", sortedData);
+        });
+    svgTable.append("rect")//sort button down song
+        .attr("id", "songdown")
+        .classed("sort-button", true)
+        .attr("x", widthSong/2)
+        .attr("y", heightElement-heightSortButton)
+        .attr("width", widthSong/2)
+        .attr("height", heightSortButton)
+        .attr("fill", "white")
+        .attr("stroke-width", 2)
+        .attr("stroke", "black")
+        .on("click", function(){
+            svgTable.selectAll(".sort-button").attr("fill", "white");
+            d3.select("#songdown").attr("fill", "black");
+            let sortedData = sortTable(tableData, 1, "desc");
+            console.log("sorted", sortedData);
+        });
 
     for (let i = 0; i < attributes.length; i++) {
         svgTable.append("rect")// headline elements for attributes
@@ -249,8 +304,40 @@ const renderTable = () => {
             .text(attributes[i].attribute)
             .attr("class", "tableHeadline")
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length) / 2)
-            .attr("y", heightElement / 2)
+            .attr("y", (heightElement - heightSortButton)/ 2)
             .attr("dominant-baseline", "central");
+        svgTable.append("rect")
+            .attr("id", attributes[i].id + "up")
+            .classed("sort-button", true)
+            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
+            .attr("y", heightElement-heightSortButton)
+            .attr("width", ((width - widthSong) / attributes.length)/2)
+            .attr("height", heightSortButton)
+            .attr("fill", "white")
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .on("click", function(){
+                svgTable.selectAll(".sort-button").attr("fill", "white");
+                d3.select("#" + attributes[i].id + "up").attr("fill", "black");
+                let sortedData = sortTable(tableData, attributes[i].arrayIndex, "asc");
+                console.log("sorted", sortedData);
+            });
+        svgTable.append("rect")
+            .attr("id", attributes[i].id + "down")
+            .classed("sort-button", true)
+            .attr("x", (widthSong + ((width - widthSong) / attributes.length) * (i+1)) - ((width - widthSong) / attributes.length)/2)
+            .attr("y", heightElement-heightSortButton)
+            .attr("width", ((width - widthSong) / attributes.length)/2)
+            .attr("height", heightSortButton)
+            .attr("fill", "white")
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .on("click", function(){
+                svgTable.selectAll(".sort-button").attr("fill", "white");
+                d3.select("#" + attributes[i].id + "down").attr("fill", "black");
+                let sortedData = sortTable(tableData, attributes[i].arrayIndex, "desc");
+                console.log("sorted", sortedData);
+            });
     };
 
     // making the table grid and append the values to the table
@@ -270,13 +357,13 @@ const renderTable = () => {
             .attr("y", heightElement + heightElement * i)
             .attr("width", widthSong)
             .attr("height", heightElement)
-            .attr("fill", tableData[i][11])
+            .attr("fill", sortedData[i][11])
             .attr("stroke-width", 2)
             .attr("stroke","black")
             .on("mouseover", function () {
-                d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+                d3.select("#Row" + i + "highlight").attr("stroke", sortedData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong, i); //places the scrolling song title
+                makeScrolingSongTitle(svgTable, sortedData, widthSong, i); //places the scrolling song title
             })
             .on("mouseout", function () {
                 d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
@@ -297,11 +384,11 @@ const renderTable = () => {
             .attr("x", 5)
             .attr("y", heightElement + heightElement * i + heightElement / 4)
             .attr("dominant-baseline", "central")
-            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong)}</tspan><br><tspan class="card-text" x="5" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong)}</tspan>`)
+            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, sortedData[i][1], widthSong)}</tspan><br><tspan class="card-text" x="5" dy="1.2em">${cropText(svgTable, sortedData[i][2], widthSong)}</tspan>`)
             .on("mouseover", function () {
-                d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+                d3.select("#Row" + i + "highlight").attr("stroke", sortedData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong, i); //places the scrolling song title
+                makeScrolingSongTitle(svgTable, sortedData, widthSong, i); //places the scrolling song title
             })
             .on("mouseout", function () {
                 d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
@@ -320,10 +407,10 @@ const renderTable = () => {
                 .attr("height", heightElement)
                 .attr("fill", "black")
                 .attr("stroke-width", 2)
-                .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
+                .attr("fill-opacity", attributes[j].scale(sortedData[i][attributes[j].arrayIndex]))
                 .attr("stroke", "none")
                 .on("mouseover", function () {
-                    d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+                    d3.select("#Row" + i + "highlight").attr("stroke", sortedData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                     d3.select("#" + attributes[j].id + "Row" + i + "value").style("visibility", "visible");
                 })
                 .on("mouseout", function () {
@@ -333,14 +420,14 @@ const renderTable = () => {
             svgTable.append("text")
                 .attr("id", attributes[j].id + "Row" + i + "value")
                 .style("text-anchor", "middle")
-                .text(tableData[i][attributes[j].arrayIndex])
+                .text(sortedData[i][attributes[j].arrayIndex])
                 .attr("class", "tableHeadline")
                 .attr("x", widthSong + ((width - widthSong) / attributes.length) * (j + 0.5))
                 .attr("y", heightElement + heightElement * (i + 0.5))
                 .attr("dominant-baseline", "central")
                 .style("visibility", "hidden")
                 .style("pointer-events", "none");
-            if (attributes[j].scale(tableData[i][attributes[j].arrayIndex]) < 0.5){
+            if (attributes[j].scale(sortedData[i][attributes[j].arrayIndex]) < 0.5){
                 d3.select("#" + attributes[j].id + "Row" + i + "value").attr("fill", "black");  
             }
             else{
