@@ -59,7 +59,7 @@ function cropText(textElement, text, widthElement) {
     }
     else {
         while (tempText.node().getComputedTextLength() > widthElement - 5) {
-            croppedText = croppedText.slice(0, -4); // Remove one character at a time
+            croppedText = croppedText.slice(0, -4); 
             tempText.text(croppedText + "...");
         }
         croppedText = croppedText + "..."
@@ -128,6 +128,7 @@ function makeScrolingSongTitle(svgObject, data, widthScroling, i) {
 
 function renderTableOutline(tableData, data, attributes) {
     let svgTable = d3.select("#attributeTable")
+    svgTable.selectAll("*").remove();
     svgTable = svgTable.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -370,12 +371,12 @@ const renderTable = () => {
     let sortedData = [];
     let data = selectedSongs
     let tableData = prepDataTable(data);    
-    if (sortedData.length = 0){
-        let tableData = prepDataTable(data);
-    }
-    else {
-        let tableData = sortedData
-    }
+    //if (sortedData.length = 0){
+      //  let tableData = prepDataTable(data);
+   // }
+    //else {
+      //  let tableData = sortedData
+    //}
     console.log("value of sortedData", sortedData)
 
     // Definition of the luminance scales which are then stored in "attributes" as "scale"
