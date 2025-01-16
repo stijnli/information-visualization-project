@@ -170,12 +170,28 @@ function renderTableOutline(tableData, data, attributes) {
         .attr("stroke-width", 2)
         .attr("stroke", "black")
         .on("click", function(){
-            svgTable.selectAll(".sort-button").attr("fill", "white");
-            d3.select("#songup").attr("fill", "black");
+              //reset of buttons
+              svgTable.selectAll(".sort-button").attr("fill", "white");
+              d3.selectAll(".sortText").attr("fill", "black");
+              //setting the selected buttton
+              d3.select("#songup").attr("fill", "black");
+              d3.select("#textSongup").attr("fill", "white");
+              //sorting the data
             let sortedData = sortTable(tableData, 1, "asc");
             console.log("sorted", sortedData);
             renderTableData(svgTable, sortedData, attributes);
         });
+        
+    svgTable.append("text")
+        .attr("id", "textSongup")
+        .attr("class", "tableHeadline sortText")
+        .attr("x", widthSong/4)
+        .attr("y", heightElement-heightSortButton/2)
+        .style("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .text("ascending")
+        .style("pointer-events", "none");
+       
     svgTable.append("rect")//sort button down song
         .attr("id", "songdown")
         .classed("sort-button", true)
@@ -187,12 +203,26 @@ function renderTableOutline(tableData, data, attributes) {
         .attr("stroke-width", 2)
         .attr("stroke", "black")
         .on("click", function(){
+            //reset of buttons
             svgTable.selectAll(".sort-button").attr("fill", "white");
+            d3.selectAll(".sortText").attr("fill", "black");
+            //setting the selected buttton
             d3.select("#songdown").attr("fill", "black");
+            d3.select("#textSongdown").attr("fill", "white");
+            //sorting the data
             let sortedData = sortTable(tableData, 1, "desc");
             console.log("sorted", sortedData);
             renderTableData(svgTable, sortedData, attributes);
         });
+    svgTable.append("text")
+        .attr("id", "textSongdown")
+        .attr("class", "tableHeadline sortText")
+        .attr("x", 3*widthSong/4)
+        .attr("y", heightElement-heightSortButton/2)
+        .style("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .text("descending")
+        .style("pointer-events", "none");
 
     for (let i = 0; i < attributes.length; i++) {
         svgTable.append("rect")// headline elements for attributes
@@ -222,12 +252,27 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("stroke-width", 2)
             .attr("stroke", "black")
             .on("click", function(){
+                //reset of buttons
                 svgTable.selectAll(".sort-button").attr("fill", "white");
+                d3.selectAll(".sortText").attr("fill", "black");
+                //setting the selected buttton
                 d3.select("#" + attributes[i].id + "up").attr("fill", "black");
+                d3.select("#text"+ attributes[i].id + "up").attr("fill", "white");
+                //sorting the data
                 let sortedData = sortTable(tableData, attributes[i].arrayIndex, "asc");
                 console.log("sorted", sortedData);
                 renderTableData(svgTable, sortedData, attributes);
             });
+        svgTable.append("text")
+            .attr("id", "text" + attributes[i].id + "up")
+            .attr("class", "tableHeadline sortText")
+            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length)/4)
+            .attr("y", heightElement-heightSortButton/2)
+            .style("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .text("asc")
+            .style("pointer-events", "none");
+        
         svgTable.append("rect")
             .attr("id", attributes[i].id + "down")
             .classed("sort-button", true)
@@ -239,12 +284,26 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("stroke-width", 2)
             .attr("stroke", "black")
             .on("click", function(){
+                //reset of buttons
                 svgTable.selectAll(".sort-button").attr("fill", "white");
+                d3.selectAll(".sortText").attr("fill", "black");
+                //setting the selected buttton
                 d3.select("#" + attributes[i].id + "down").attr("fill", "black");
+                d3.select("#text"+ attributes[i].id + "down").attr("fill", "white");
+                //sorting the data
                 let sortedData = sortTable(tableData, attributes[i].arrayIndex, "desc");
                 console.log("sorted", sortedData);
                 renderTableData(svgTable, sortedData, attributes);
             });
+        svgTable.append("text")
+            .attr("id", "text" + attributes[i].id + "down")
+            .attr("class", "tableHeadline sortText")
+            .attr("x", (widthSong + ((width - widthSong) / attributes.length) * (i+1)) - ((width - widthSong) / attributes.length)/4)
+            .attr("y", heightElement-heightSortButton/2)
+            .style("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .text("desc")
+            .style("pointer-events", "none");
     };
     return svgTable;
 }
@@ -252,7 +311,7 @@ function renderTableData (svgTable, tableData, attributes){
     // making the table grid and append the values to the table
     svgTable.selectAll(".valuesInTable").remove();
     for (let i = 0; i < tableData.length; i++) {
-        svgTable.append("clipPath")// for the scrolling text while hoveriong over one specific song
+        svgTable.append("clipPath")// for the scrolling text while hovering over one specific song
             .attr("id", "clip-border" + i)
             .classed("valuesInTable", true)
             .append("rect")
@@ -371,14 +430,7 @@ const renderTable = () => {
     let sortedData = [];
     let data = selectedSongs
     let tableData = prepDataTable(data);    
-    //if (sortedData.length = 0){
-      //  let tableData = prepDataTable(data);
-   // }
-    //else {
-      //  let tableData = sortedData
-    //}
-    console.log("value of sortedData", sortedData)
-
+   
     // Definition of the luminance scales which are then stored in "attributes" as "scale"
     let colorScaleDanceability = d3.scaleLinear()
         .domain([d3.min(data, function (d) {
