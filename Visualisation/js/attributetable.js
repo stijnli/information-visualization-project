@@ -237,10 +237,17 @@ function renderTableOutline(tableData, data, attributes) {
             .on("mouseover", function () {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
                 d3.select("#" + attributes[i].id + "column").style("visibility", "visible");
+                tooltipAttributes.style("visibility", "visible").text(attributes[i].description + " (Source: Spotify)");
+            })
+            .on("mousemove", function (event) {
+                // Update tooltip position
+                tooltipAttributes.style("top", (event.pageY + 10) + "px") // 10px offset for better visibility
+                    .style("left", (event.pageX + 10) + "px");
             })
             .on("mouseout", function () {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "hidden");
                 d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
+                tooltipAttributes.style("visibility", "hidden");
             });
         svgTable.append("text")
             .style("text-anchor", "middle")
@@ -272,6 +279,14 @@ function renderTableOutline(tableData, data, attributes) {
                 let sortedData = sortTable(tableData, attributes[i].arrayIndex, "asc");
                 console.log("sorted", sortedData);
                 renderTableData(svgTable, sortedData, attributes);
+            })
+            .on("mouseover", function () {
+                d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
+                d3.select("#" + attributes[i].id + "column").style("visibility", "visible");
+            })
+            .on("mouseout", function () {
+                d3.selectAll(".values" + attributes[i].id).style("visibility", "hidden");
+                d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
             });
         svgTable.append("text")
             .attr("id", "text" + attributes[i].id + "up")
@@ -304,6 +319,14 @@ function renderTableOutline(tableData, data, attributes) {
                 let sortedData = sortTable(tableData, attributes[i].arrayIndex, "desc");
                 console.log("sorted", sortedData);
                 renderTableData(svgTable, sortedData, attributes);
+            })
+            .on("mouseover", function () {
+                d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
+                d3.select("#" + attributes[i].id + "column").style("visibility", "visible");
+            })
+            .on("mouseout", function () {
+                d3.selectAll(".values" + attributes[i].id).style("visibility", "hidden");
+                d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
             });
         svgTable.append("text")
             .attr("id", "text" + attributes[i].id + "down")
@@ -464,6 +487,18 @@ function renderTableData (svgTable, tableData, attributes){
             .style("pointer-events", "none");
     }
 }
+const tooltipAttributes = d3.select("body")
+    .append("div")
+    .attr("class", "custom-tooltip")
+    .style("position", "absolute")
+    .style("background", "rgb(255, 255, 255)")
+    .style("color", "black")
+    .style("padding", "10px")
+    .style("font-size", "12px")
+    .style("line-height", "1.5")
+    .style("max-width", "200px") 
+    .style("visibility", "hidden")
+    .style("pointer-events", "none");
 
 // Margin object with properties for the four directions
 const margin = {

@@ -7,3 +7,7 @@ body{
 .tableHeadline{
     font-size: 12px
 }
+
+.custom-tooltip{
+    outline: 1px solid;
+}
