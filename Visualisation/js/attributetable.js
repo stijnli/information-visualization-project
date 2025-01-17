@@ -391,9 +391,9 @@ function renderTableData (svgTable, tableData, attributes){
             .attr("id", "clip-border" + i)
             .classed("valuesInTable", true)
             .append("rect")
-            .attr("x", 5)
+            .attr("x", 45)
             .attr("y", heightElement + heightElement * i)
-            .attr("width", widthSong - 10)
+            .attr("width", widthSong - 50)
             .attr("height", heightElement);
 
         svgTable.append("rect") // addig the box for the song title
@@ -403,13 +403,13 @@ function renderTableData (svgTable, tableData, attributes){
             .attr("y", heightElement + heightElement * i)
             .attr("width", widthSong)
             .attr("height", heightElement)
-            .attr("fill", tableData[i][11])
+            .attr("fill", "white")
             .attr("stroke-width", 2)
             .attr("stroke","black")
             .on("mouseover", function () {
                 d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong, i); //places the scrolling song title
+                makeScrolingSongTitle(svgTable, tableData, widthSong-40, i); //places the scrolling song title
             })
             .on("mouseout", function () {
                 d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
@@ -421,22 +421,36 @@ function renderTableData (svgTable, tableData, attributes){
         svgTable.append("text")// append static title to first collunm
             .attr("id", "song" + i + "inTable")
             .classed("valuesInTable", true)
-            .attr("x", 5)
+            .attr("x", 45)
             .attr("y", heightElement + heightElement * i + heightElement / 4)
             .attr("dominant-baseline", "central")
-            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong)}</tspan><br><tspan class="card-text" x="5" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong)}</tspan>`)
+            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong-45)}</tspan><br><tspan class="card-text" x="45" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong-45)}</tspan>`)
             .on("mouseover", function () {
                 d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
                 d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong, i); //places the scrolling song title
+                makeScrolingSongTitle(svgTable, tableData, widthSong-40, i); //places the scrolling song title
             })
             .on("mouseout", function () {
                 d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
                 d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
                 d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
             });
-
-
+        svgTable.append("rect")
+            .attr("x", 0)
+            .attr("y", heightElement + heightElement * i)
+            .attr("width", 40)
+            .attr("height", heightElement)
+            .attr("fill", tableData[i][11])
+            .on("mouseover", function () {
+                d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+                d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
+                makeScrolingSongTitle(svgTable, tableData, widthSong-40, i); //places the scrolling song title
+            })
+            .on("mouseout", function () {
+                d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
+                d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
+                d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
+            });
 
         for (let j = 0; j < attributes.length; j++) {
             svgTable.append("rect")
