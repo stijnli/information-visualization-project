@@ -231,16 +231,26 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("y", 0)
             .attr("width", ((width - widthSong) / attributes.length))
             .attr("height", heightElement)
-            .attr("fill", "none")
+            .attr("fill", "white")
             .attr("stroke-width", 2)
-            .attr("stroke", "black");
+            .attr("stroke", "black")
+            .on("mouseover", function () {
+                d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
+                d3.select("#" + attributes[i].id + "column").style("visibility", "visible");
+            })
+            .on("mouseout", function () {
+                d3.selectAll(".values" + attributes[i].id).style("visibility", "hidden");
+                d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
+            });
         svgTable.append("text")
             .style("text-anchor", "middle")
             .text(attributes[i].attribute)
             .attr("class", "tableHeadline")
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length) / 2)
             .attr("y", (heightElement - heightSortButton)/ 2)
-            .attr("dominant-baseline", "central");
+            .attr("dominant-baseline", "central")
+            .style("pointer-events", "none");
+        
         svgTable.append("rect")
             .attr("id", attributes[i].id + "up")
             .classed("sort-button", true)
@@ -304,6 +314,17 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("dominant-baseline", "central")
             .text("desc")
             .style("pointer-events", "none");
+        
+        svgTable.append("rect")//higlight of the column
+            .attr("id", attributes[i].id + "column")
+            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
+            .attr("y", 0)
+            .attr("width", ((width - widthSong) / attributes.length))
+            .attr("height", (data.length+1)*heightElement)
+            .attr("fill", "none")
+            .attr("stroke-width", 4)
+            .attr("stroke", "black")
+            .style("visibility", "hidden")
     };
     return svgTable;
 }
@@ -340,15 +361,7 @@ function renderTableData (svgTable, tableData, attributes){
                 d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
                 d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
             });
-        svgTable.append("rect")// adding box for higlighting a row when on hover
-            .attr("id", "Row" + i + "highlight")
-            .classed("valuesInTable", true)
-            .attr("x", 0)
-            .attr("y", heightElement + (heightElement * i))
-            .attr("width", width)
-            .attr("height", heightElement)
-            .attr("fill", "none")
-            .style("pointer-events", "none");
+        
 
         svgTable.append("text")// append static title to first collunm
             .attr("id", "song" + i + "inTable")
@@ -383,7 +396,7 @@ function renderTableData (svgTable, tableData, attributes){
                 .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
                 .attr("stroke", "none")
                 .on("mouseover", function () {
-                    d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+                    d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).style("visibility", "visible");
                     d3.select("#" + attributes[j].id + "Row" + i + "value").style("visibility", "visible");
                 })
                 .on("mouseout", function () {
@@ -392,7 +405,7 @@ function renderTableData (svgTable, tableData, attributes){
                 });
             svgTable.append("text")
                 .attr("id", attributes[j].id + "Row" + i + "value")
-                .classed("valuesInTable tableHeadline", true)
+                .classed("valuesInTable tableHeadline" + " values" + attributes[j].id, true)
                 .style("text-anchor", "middle")
                 .text(tableData[i][attributes[j].arrayIndex])
                 .attr("x", widthSong + ((width - widthSong) / attributes.length) * (j + 0.5))
@@ -407,6 +420,16 @@ function renderTableData (svgTable, tableData, attributes){
                 d3.select("#" + attributes[j].id + "Row" + i + "value").attr("fill", "white");
             }
         }
+        svgTable.append("rect")// adding box for higlighting a row when on hover
+            .attr("id", "Row" + i + "highlight")
+            .classed("valuesInTable", true)
+            .attr("x", 0)
+            .attr("y", heightElement + (heightElement * i))
+            .attr("width", width)
+            .attr("height", heightElement)
+            .attr("fill", "none")
+            .attr("stroke-width", 4)
+            .style("pointer-events", "none");
     }
 }
 
