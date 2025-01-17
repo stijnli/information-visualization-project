@@ -160,7 +160,6 @@ class GraphChart {
             const nodeNearby = linkNearby ? this.oldNodes.find(oldNode => oldNode.id === (linkNearby.source === node.id ? linkNearby.target : linkNearby.source)) : undefined;
 
             if (nodeNearby) {
-                console.log(nodeNearby);
                 return { ...node, x: nodeNearby.x + Math.random() * 50 - 25, y: nodeNearby.y + Math.random() * 50 - 25 };
             }
             else {

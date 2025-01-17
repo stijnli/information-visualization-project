@@ -1,6 +1,6 @@
 // Define config variables
 const config = {
-    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00",  "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
+    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00", "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
     maxSelectedSongs: 10
 }
 
@@ -26,10 +26,14 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
-    graphChart.updateVis();
+    if (graphChart !== undefined) {
+        graphChart.updateVis();
+    }
     updateRankChart();
     updateCountryDropdownMenu();
 };
+
+let graphChart = undefined;
 
 let currentHoveredSongId = undefined;
 let oldHoveredSongOutlineColor = undefined;
@@ -42,7 +46,10 @@ const setCurrentHoveredSongId = (newSongId) => {
         }
 
         // Change svg node stroke
-        document.getElementById("graphNode-" + currentHoveredSongId).style.stroke = oldHoveredSongOutlineColor
+        const graphElement = document.getElementById("graphNode-" + currentHoveredSongId);
+        if (graphElement !== null) {
+            graphElement.style.stroke = oldHoveredSongOutlineColor
+        }
         if (document.getElementById(`rankchart-${currentHoveredSongId}`) !== null) {
             document.getElementById(`rankchart-${currentHoveredSongId}`).style.opacity = 0.6;
         }
@@ -171,7 +178,6 @@ const initializeLoad = () => {
                     setArtists(artists);
                     graphChart = new GraphChart(songs, artists, albums, selectedSongs);
                     graphChart.initVis();
-                    setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
                 });
 
 
@@ -186,12 +192,43 @@ const initializeLoad = () => {
             country: d.country,
         };
     })
-    .then((data) => {
-        setMeasurements(data);
-        return fetch("data/alpha2ToCountryName.json");
-    })
-    .then((response) => response.json())
-    .then((alpha2ToCountryCode) => initCountryOptions(alpha2ToCountryCode));
+        .then((data) => {
+            setMeasurements(data);
+            setIntialSongSelection();
+
+            return fetch("data/alpha2ToCountryName.json");
+        })
+        .then((response) => response.json())
+        .then((alpha2ToCountryCode) => initCountryOptions(alpha2ToCountryCode));
+
+    function setIntialSongSelection() {
+        if (selectedSongs.length > 0) {
+            return true;
+        }
+        if (songs.length === 0 || measurements.length === 0) {
+            setTimeout(() => {
+                setIntialSongSelection();
+            }, 1000);
+        }
+        const rankPerSong = new Map();
+        measurements.forEach(measurement => {
+            if (!rankPerSong.has(measurement.spotify_id)) {
+                rankPerSong.set(measurement.spotify_id, 0);
+            }
+            rankPerSong.set(measurement.spotify_id, rankPerSong.get(measurement.spotify_id) + 51 - measurement.daily_rank)
+        });
+        const topSongs = [...rankPerSong.entries()].sort((a, b) => b[1] - a[1]).slice(0, 50);
+
+        // Sample 5 random song ids from the 5% top songs
+        const sample = [];
+        for (let i = 0; i < 5; i++) {
+            const randomIndex = Math.floor(Math.random() * topSongs.length);
+            sample.push(topSongs[randomIndex][0]);
+            topSongs.splice(randomIndex, 1);
+        }
+        setSelectedSongs(songs.filter(song => sample.includes(song.id)));
+    }
+
 
     renderMusicSelection();
     initRankChart();
