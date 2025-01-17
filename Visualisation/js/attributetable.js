@@ -325,6 +325,38 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("stroke-width", 4)
             .attr("stroke", "black")
             .style("visibility", "hidden")
+        // handling length song selection < 2
+        if (data.length == 0){
+            svgTable.selectAll("*").remove();
+        }
+        if (data.length == 1){
+            svgTable.append("rect")
+                .attr("x", 0)
+                .attr("y", heightElement*2)
+                .attr("width", width)
+                .attr("height", heightElement)
+                .attr("fill", "#fff3cd")
+                .attr("stroke-width", 2) 
+            svgTable.append("text")
+                .attr("x", margin.left)
+                .attr("y", heightElement*2 + heightElement/2)
+                .text("Select at least one other song for which you want to compare the attributes.")
+                .attr("fill", "#856404")
+        }
+        if (data.length == 2){
+            svgTable.append("rect")
+                .attr("x", 0)
+                .attr("y", heightElement*3)
+                .attr("width", width)
+                .attr("height", heightElement+ margin.bottom)
+                .attr("fill", "#fff3cd")
+                .attr("stroke-width", 2) 
+            svgTable.append("text")
+                .attr("x", margin.left)
+                .attr("y", heightElement*3 + heightElement/2)
+                .html(`<tspan dy="0">Note that the elements show how the attributes compare in the songselection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the table does not show the degree to which the values vary.</tspan>`)
+                .attr("fill", "#856404")
+        }
     };
     return svgTable;
 }
