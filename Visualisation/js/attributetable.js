@@ -1,6 +1,3 @@
-// data is a subset of the orignal data used during the builiding process
-// inputs is the variable where to test the different legths of the dataset
-
 /// --- prepDataTable takes the raw data and prepares in an array; 
 // the index of each element in tempRow is used in the objects of "attributes" as "arrayIndex" 
 function prepDataTable(data) {
