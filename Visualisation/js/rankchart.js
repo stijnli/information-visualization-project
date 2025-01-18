@@ -4,11 +4,13 @@ let mouseLine;
 let tooltip;
 let tooltipBackground;
 let tooltipText;
+let rectOverlay;
 
 let selectedSongMeasurements;
 let measurements = [];
 let selectedCountry = "";
 let countryOptions = [];
+let formatTime = d3.timeFormat("%b %e %Y");
 
 let x;
 let y;
@@ -131,7 +133,7 @@ function initRankChart() {
             .attr('width', width)
             .attr('height', height);
 
-    g.append('rect')
+    rectOverlay = g.append('rect')
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', width)
@@ -274,8 +276,8 @@ function updateCountryDropdownMenu() {
 
 function updateRankChart() {
     // Remove all lines in the graph
-    g.selectAll("g").remove();
-    g.selectAll("path").remove();
+    g.selectAll(".axis").remove();
+    g.selectAll(".pathLine").remove();
 
     // Get ranking data from selected songs and group by spotify id
     let selectedSongsIds = selectedSongs.map((song) => song.id);
@@ -320,6 +322,7 @@ function updateRankChart() {
         .range([0, width]);
     xAxis = g
         .append("g")
+        .attr("class", "axis")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
 
@@ -339,6 +342,7 @@ function updateRankChart() {
     y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
     yAxis = g
     .append("g")
+    .attr("class", "axis")
     .call(d3.axisLeft(y))
     .append('text')
     .attr('class', 'axis-label')
@@ -352,6 +356,7 @@ function updateRankChart() {
         .data(groupedSelectedMeasurements)
         .join("path")
         .attr("fill", "none")
+        .attr("class", "pathLine")
         .attr("stroke", (d) => getSongColor(d[0]))
         .attr("stroke-width", 3)
         .attr("opacity", 0.6)
@@ -366,6 +371,7 @@ function updateRankChart() {
         .attr('clip-path', 'url("#clipRect")')
         .clone()
         .attr("stroke", "transparent")
+        .attr("class", "transparent-line-hitbox pathLine")
         .attr("stroke-width", 15)
         .attr("onmouseover", (d) => `setCurrentHoveredSongId('${d[0]}')`)
         .attr("onmouseout", "setCurrentHoveredSongId(undefined)")
@@ -373,18 +379,61 @@ function updateRankChart() {
 }
 
 function pointerMoved(event) {
-    const [xm, ym] = d3.pointer(event);
-    var dateOnMouse = x.invert(d3.pointer(event)[0]);
-    // console.log(dateOnMouse);
-
-    closest = getClosestDate(selectedSongMeasurements, dateOnMouse);
-    console.log(closest);
-    // var bisectDate = d3.bisector(d => d.snapshot_date).left;
-    // var i = bisectDate(selectedSongMeasurements, dateOnMouse); // returns the index to the current data item
-    // console.log(selectedSongMeasurements[i].snapshot_date);
-
     // get closest date to mouse
+    const [xm, ym] = d3.pointer(event);
+    let dateOnMouse = x.invert(xm);
+    let closestDate = getClosestDate(selectedSongMeasurements, dateOnMouse);
+
     // use selectedSongMeasurements to get all rankings and ids
+    let songsOnTheLine = selectedSongMeasurements.filter(d => d.snapshot_date === closestDate);
+
+    let mouseLineXCoord = x(closestDate);
+    mouseLine.attr("d", `M ${mouseLineXCoord} 0 V ${height}`).attr("opacity", "1");
+    
+    tooltipText.selectAll(".tooltip-text-line").remove();
+    g.selectAll(".tooltip-line-circles").remove();
+
+    tooltipText
+      .append("tspan")
+      .attr("class", "tooltip-text-line")
+      .attr("x", "5")
+      .attr("y", "5")
+      .attr("dy", "13px")
+      .attr("font-weight", "bold")
+      .text(`${formatTime(closestDate)}`);
+
+    for (const song of songsOnTheLine) {
+        g.append("circle")
+            .attr("class", "tooltip-line-circles")
+            .attr("r", 5)
+            .attr("stroke", "#303030")
+            .attr("stroke-width", 2)
+            .attr("fill", getSongColor(song.spotify_id))
+            .attr("cx", mouseLineXCoord)
+            .attr("cy", y(+song.daily_rank));
+
+        tooltipText.append("tspan")
+            .attr("class", "tooltip-text-line")
+            .attr("x", "5")
+            .attr("dy", `14px`)
+            .attr("fill", getSongColor(song.spotify_id))
+            .text(`${song.spotify_id}: ${song.daily_rank}`);
+    }
+    g.selectAll(".transparent-line-hitbox").raise();
+
+    let tooltipWidth = tooltipText.node().getBBox().width;
+    let tooltipHeight = tooltipText.node().getBBox().height;
+    let rectOverlayWidth = rectOverlay.node().getBBox().width;
+    tooltipBackground.attr("width", tooltipWidth + 10).attr("height", tooltipHeight + 10);
+    if (mouseLineXCoord + tooltipWidth >= rectOverlayWidth) {
+      tooltip.attr("transform", "translate(" + (mouseLineXCoord - tooltipWidth - 20) + "," + ym + ")");
+    } else {
+      tooltip.attr("transform", "translate(" + (mouseLineXCoord + 10) + "," + ym + ")");
+    }
+
+    tooltip.raise();
+    tooltip.attr("display", null);
+
     // make tooltip visible, move to right place, make title as mouse date
     // for all lines
     //      place a point in the graph if there if there is a rank available
@@ -405,6 +454,7 @@ function pointerMoved(event) {
   }
 
 function getClosestDate(data, targetDate) {
+    // should just snap to a visible 00:00 
     let bestDate;
     let bestDiff = Infinity;
     let currDiff = 0;
