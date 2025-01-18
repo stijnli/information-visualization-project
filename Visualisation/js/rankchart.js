@@ -387,7 +387,6 @@ function pointerMoved(event) {
 
     // use selectedSongMeasurements to get all rankings and ids
     let songsOnTheLine = selectedSongMeasurements.filter(d => d.snapshot_date.getTime() === closestDate.getTime());
-    console.log(songsOnTheLine);
 
     let mouseLineXCoord = x(closestDate);
     mouseLine.attr("d", `M ${mouseLineXCoord} 0 V ${height}`).attr("opacity", "1");
@@ -450,26 +449,20 @@ function pointerMoved(event) {
   }
 
   function pointerOut() {
+    console.log('out');
     mouseLine.attr("opacity", "0");
     tooltip.attr("display", "none");
     svg.selectAll(".tooltip-line-circles").remove();
   }
 
 function getClosestDate(data, targetDate) {
-    // should just snap to a visible 00:00 
-    let bestDate;
-    let bestDiff = Infinity;
-    let currDiff = 0;
-
-    for (const songObj of data) {
-        currDiff = Math.abs(songObj.snapshot_date.getTime() - targetDate.getTime());
-        if(currDiff < bestDiff){
-            bestDate = songObj.snapshot_date;
-            bestDiff = currDiff;
-        }
-    }
+    let previousMidnight = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
+    let nextMidnight = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 24, 0, 0);
     
-    return bestDate;
+    if (Math.abs(previousMidnight - targetDate) < Math.abs(nextMidnight - targetDate)) {
+        return previousMidnight
+    }
+    return nextMidnight;
 }
 
 function sortCountryOptionsAlphabetically(arrayOfOptions) {
