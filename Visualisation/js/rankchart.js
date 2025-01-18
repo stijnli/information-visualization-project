@@ -143,13 +143,6 @@ function initRankChart() {
             .attr('width', width)
             .attr('height', height);
 
-    mouseLine = g
-        .append("path") // create vertical line to follow mouse
-        .attr("class", "mouse-line")
-        .attr("stroke", "#303030")
-        .attr("stroke-width", 2)
-        .attr("opacity", "0");
-
     rectOverlay = g.append('rect')
         .attr('x', 0)
         .attr('y', 0)
@@ -161,10 +154,17 @@ function initRankChart() {
         .on("mouseover", pointerOver)
         .on("mouseout", pointerOut);
 
+    mouseLine = g
+        .append("path") // create vertical line to follow mouse
+        .attr("class", "mouse-line")
+        .attr("stroke", "#303030")
+        .attr("stroke-width", 2)
+        .attr("opacity", "0");
+
     tooltip = g
-    .append("g")
-    .attr("class", "tooltip-wrapper")
-    .attr("display", "none");
+        .append("g")
+        .attr("class", "tooltip-wrapper")
+        .attr("display", "none");
 
     tooltipBackground = tooltip.append("rect").attr("fill", "#e8e8e8");
 
@@ -415,7 +415,7 @@ function pointerMoved(event) {
             .attr("fill", getSongColor(song.spotify_id))
             .text(`${song.spotify_id}: ${song.daily_rank}`);
     }
-    g.selectAll(".transparent-line-hitbox").raise();
+
 
     let tooltipWidth = tooltipText.node().getBBox().width;
     let tooltipHeight = tooltipText.node().getBBox().height;
@@ -427,8 +427,11 @@ function pointerMoved(event) {
       tooltip.attr("transform", "translate(" + (mouseLineXCoord + 10) + "," + ym + ")");
     }
 
-    tooltip.raise();
     tooltip.attr("display", null);
+
+    g.selectAll(".transparent-line-hitbox").raise();
+    tooltip.raise();
+    rectOverlay.raise();
   }
 
   function pointerOver() {
@@ -437,7 +440,6 @@ function pointerMoved(event) {
   }
 
   function pointerOut() {
-    console.log('out');
     mouseLine.attr("opacity", "0");
     tooltip.attr("display", "none");
     svg.selectAll(".tooltip-line-circles").remove();
