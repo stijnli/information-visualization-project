@@ -1,3 +1,13 @@
+/*
+ * This file contains code for the rank chart.
+ *
+ * Some sources that helped with inspiration:
+ * Basic line plot with multiple lines: https://d3-graph-gallery.com/graph/line_several_group.html
+ * Tooltip and mouse line on-hover: https://observablehq.com/@connor-roche/multi-line-chart-focus-context-w-mouseover-tooltip
+ * Dropdown for country selection: https://d3-graph-gallery.com/graph/line_select.html
+ * Source of the country name JSON: https://gist.github.com/ssskip/5a94bfcd2835bf1dea52 
+ */
+
 let svg;
 let g;
 let mouseLine;
@@ -159,21 +169,6 @@ function initRankChart() {
     tooltipBackground = tooltip.append("rect").attr("fill", "#e8e8e8");
 
     tooltipText = tooltip.append("text");
-
-    // focus = svg.append("g") 
-    // .attr("class", "focus")
-    // .attr("transform", "translate(-100,-100)");
-
-    // focus.append("circle")
-    // .attr("r", 7)
-    // .attr("fill", "none")
-    // .attr("stroke", "black")
-    // .attr("stroke-width", 2);
-
-    // focus.append("text")
-    // .attr("x", 9)
-    // .attr("dy", ".35em");
-      
 }
 
 function initCountryOptions(alpha2ToCountryCode) {
@@ -434,13 +429,6 @@ function pointerMoved(event) {
 
     tooltip.raise();
     tooltip.attr("display", null);
-
-    // make tooltip visible, move to right place, make title as mouse date
-    // for all lines
-    //      place a point in the graph if there if there is a rank available
-    //      add text to tooltip
-    // make tooltip visible and determine left or right
-    
   }
 
   function pointerOver() {
