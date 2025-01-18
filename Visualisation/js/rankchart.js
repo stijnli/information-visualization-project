@@ -1,9 +1,17 @@
 let svg;
 let g;
-let focus;
+let mouseLine;
+let tooltip;
+let tooltipBackground;
+let tooltipText;
+
+let selectedSongMeasurements;
 let measurements = [];
 let selectedCountry = "";
 let countryOptions = [];
+
+let x;
+let y;
 
 const globalName = "Global";
 const oneDay = 86400000;
@@ -123,19 +131,45 @@ function initRankChart() {
             .attr('width', width)
             .attr('height', height);
 
-    focus = svg.append("g")
-    .attr("class", "focus")
-    .attr("transform", "translate(-100,-100)");
+    g.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', width)
+        .attr('height', height)
+        .attr("opacity", "0")
+        .attr('pointer-events', 'all')
+        .on('mousemove', (event, d) => pointerMoved(event));
+        // .on('pointerleave', () => pointerLeft());
 
-    focus.append("circle")
-    .attr("r", 7)
-    .attr("fill", "none")
-    .attr("stroke", "black")
-    .attr("stroke-width", 2);
+    mouseLine = g
+    .append("path") // create vertical line to follow mouse
+    .attr("class", "mouse-line")
+    .attr("stroke", "#303030")
+    .attr("stroke-width", 2)
+    .attr("opacity", "0");
 
-    focus.append("text")
-    .attr("x", 9)
-    .attr("dy", ".35em");
+    tooltip = g
+    .append("g")
+    .attr("class", "tooltip-wrapper")
+    .attr("display", "none");
+
+    tooltipBackground = tooltip.append("rect").attr("fill", "#e8e8e8");
+
+    tooltipText = tooltip.append("text");
+
+    // focus = svg.append("g") 
+    // .attr("class", "focus")
+    // .attr("transform", "translate(-100,-100)");
+
+    // focus.append("circle")
+    // .attr("r", 7)
+    // .attr("fill", "none")
+    // .attr("stroke", "black")
+    // .attr("stroke-width", 2);
+
+    // focus.append("text")
+    // .attr("x", 9)
+    // .attr("dy", ".35em");
       
 }
 
@@ -245,7 +279,7 @@ function updateRankChart() {
 
     // Get ranking data from selected songs and group by spotify id
     let selectedSongsIds = selectedSongs.map((song) => song.id);
-    let selectedSongMeasurements = measurements.filter(
+    selectedSongMeasurements = measurements.filter(
         (entry) =>
             selectedSongsIds.includes(entry.spotify_id) &&
             entry.country === selectedCountry
@@ -254,6 +288,8 @@ function updateRankChart() {
         selectedSongMeasurements,
         (d) => d.spotify_id
     );
+
+    console.log(selectedSongMeasurements);
 
     wrangleMeasurements(groupedSelectedMeasurements);
 
@@ -277,7 +313,7 @@ function updateRankChart() {
     // Scale the x-axis for time data
     const xExtend = d3.extent(selectedSongMeasurements, (d) => d.snapshot_date)
 
-    const x = d3
+    x = d3
         .scaleTime()
         .domain([new Date(xExtend[0].getTime() - oneDay), xExtend[1]])
         .nice()
@@ -300,7 +336,7 @@ function updateRankChart() {
     .attr('y', 55) // Relative to the x axis.
 
     // Scale the y-axis for ranking 1-50
-    const y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
+    y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
     yAxis = g
     .append("g")
     .call(d3.axisLeft(y))
@@ -333,20 +369,55 @@ function updateRankChart() {
         .attr("stroke-width", 15)
         .attr("onmouseover", (d) => `setCurrentHoveredSongId('${d[0]}')`)
         .attr("onmouseout", "setCurrentHoveredSongId(undefined)")
-        .on('pointermove', (event, d) => pointerMoved(event, d))
-        .on('pointerleave', () => pointerLeft());
+        .on('mousemove', (event, d) => pointerMoved(event));
+}
 
-        function pointerMoved(event, d) {
-            const [xm, ym] = d3.pointer(event);
-            const i = d3.least(d[1], i => Math.hypot(x(i.snapshot_date) - xm, y(+i.daily_rank) - ym)); // closest point
+function pointerMoved(event) {
+    const [xm, ym] = d3.pointer(event);
+    var dateOnMouse = x.invert(d3.pointer(event)[0]);
+    // console.log(dateOnMouse);
 
-            focus.lower().attr("transform", "translate(" + (x(i.snapshot_date) + margin.left) + "," + (y(i.daily_rank) + margin.top) + ")");
-            focus.raise().select("text").text('hi');
-          }
-        
-          function pointerLeft() {
-            focus.attr("transform", "translate(-100,-100)");
-          }
+    closest = getClosestDate(selectedSongMeasurements, dateOnMouse);
+    console.log(closest);
+    // var bisectDate = d3.bisector(d => d.snapshot_date).left;
+    // var i = bisectDate(selectedSongMeasurements, dateOnMouse); // returns the index to the current data item
+    // console.log(selectedSongMeasurements[i].snapshot_date);
+
+    // get closest date to mouse
+    // use selectedSongMeasurements to get all rankings and ids
+    // make tooltip visible, move to right place, make title as mouse date
+    // for all lines
+    //      place a point in the graph if there if there is a rank available
+    //      add text to tooltip
+    // make tooltip visible and determine left or right
+    
+  }
+
+  function pointerOver() {
+    mouseLine.attr("opacity", "1");
+    tooltip.attr("display", null);
+  }
+
+  function pointerOut() {
+    mouseLine.attr("opacity", "0");
+    tooltip.attr("display", "none");
+    svg.selectAll(".tooltip-line-circles").remove();
+  }
+
+function getClosestDate(data, targetDate) {
+    let bestDate;
+    let bestDiff = Infinity;
+    let currDiff = 0;
+
+    for (const songObj of data) {
+        currDiff = Math.abs(songObj.snapshot_date.getTime() - targetDate.getTime());
+        if(currDiff < bestDiff){
+            bestDate = songObj.snapshot_date;
+            bestDiff = currDiff;
+        }
+    }
+    
+    return bestDate;
 }
 
 function sortCountryOptionsAlphabetically(arrayOfOptions) {
