@@ -133,6 +133,13 @@ function initRankChart() {
             .attr('width', width)
             .attr('height', height);
 
+    mouseLine = g
+        .append("path") // create vertical line to follow mouse
+        .attr("class", "mouse-line")
+        .attr("stroke", "#303030")
+        .attr("stroke-width", 2)
+        .attr("opacity", "0");
+
     rectOverlay = g.append('rect')
         .attr('x', 0)
         .attr('y', 0)
@@ -140,15 +147,9 @@ function initRankChart() {
         .attr('height', height)
         .attr("opacity", "0")
         .attr('pointer-events', 'all')
-        .on('mousemove', (event, d) => pointerMoved(event));
-        // .on('pointerleave', () => pointerLeft());
-
-    mouseLine = g
-    .append("path") // create vertical line to follow mouse
-    .attr("class", "mouse-line")
-    .attr("stroke", "#303030")
-    .attr("stroke-width", 2)
-    .attr("opacity", "0");
+        .on('mousemove', (event) => pointerMoved(event))
+        .on("mouseover", pointerOver)
+        .on("mouseout", pointerOut);
 
     tooltip = g
     .append("g")
