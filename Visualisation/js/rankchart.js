@@ -398,6 +398,7 @@ function pointerMoved(event) {
       .attr("font-weight", "bold")
       .text(`${formatTime(closestDate)}`);
 
+    let currentSongTitle;
     for (const song of songsOnTheLine) {
         g.append("circle")
             .attr("class", "tooltip-line-circles")
@@ -408,12 +409,15 @@ function pointerMoved(event) {
             .attr("cx", mouseLineXCoord)
             .attr("cy", y(+song.daily_rank));
 
+        currentSongTitle = selectedSongs.find(d => d.id === song.spotify_id).name;
+        currentSongTitle = currentSongTitle.length > 20 ? currentSongTitle.substring(0, 17) + "..." : currentSongTitle;
+
         tooltipText.append("tspan")
             .attr("class", "tooltip-text-line")
             .attr("x", "5")
             .attr("dy", `14px`)
             .attr("fill", getSongColor(song.spotify_id))
-            .text(`${song.spotify_id}: ${song.daily_rank}`);
+            .text(`${currentSongTitle}: ${song.daily_rank}`);
     }
 
 
