@@ -386,7 +386,8 @@ function pointerMoved(event) {
     let closestDate = getClosestDate(selectedSongMeasurements, dateOnMouse);
 
     // use selectedSongMeasurements to get all rankings and ids
-    let songsOnTheLine = selectedSongMeasurements.filter(d => d.snapshot_date === closestDate);
+    let songsOnTheLine = selectedSongMeasurements.filter(d => d.snapshot_date.getTime() === closestDate.getTime());
+    console.log(songsOnTheLine);
 
     let mouseLineXCoord = x(closestDate);
     mouseLine.attr("d", `M ${mouseLineXCoord} 0 V ${height}`).attr("opacity", "1");
