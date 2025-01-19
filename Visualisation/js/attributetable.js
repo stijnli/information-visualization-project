@@ -17,7 +17,6 @@ function prepDataTable(data) {
         data[i].loudness,
         data[i].color];
         Rows.push(tempRow);
-        console.log(Rows[i]);
     }
     return Rows;
 }
@@ -502,7 +501,7 @@ const tooltipAttributes = d3.select("body")
     .append("div")
     .attr("class", "custom-tooltip")
     .style("position", "absolute")
-    .style("background", "rgb(255, 255, 255)")
+    .style("background", "white")
     .style("color", "black")
     .style("padding", "10px")
     .style("font-size", "12px")
