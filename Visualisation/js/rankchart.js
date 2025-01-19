@@ -287,8 +287,6 @@ function updateRankChart() {
         (d) => d.spotify_id
     );
 
-    console.log(selectedSongMeasurements);
-
     wrangleMeasurements(groupedSelectedMeasurements);
 
     // render a message if no data is displayed in the chart
@@ -368,10 +366,7 @@ function updateRankChart() {
         .clone()
         .attr("stroke", "transparent")
         .attr("class", "transparent-line-hitbox pathLine")
-        .attr("stroke-width", 15)
-        .attr("onmouseover", (d) => `setCurrentHoveredSongId('${d[0]}')`)
-        .attr("onmouseout", "setCurrentHoveredSongId(undefined)")
-        .on('mousemove', (event, d) => pointerMoved(event));
+        .attr("stroke-width", 15);
 }
 
 function pointerMoved(event) {
