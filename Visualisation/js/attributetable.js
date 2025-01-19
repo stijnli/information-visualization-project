@@ -127,15 +127,15 @@ function renderTableOutline(tableData, data, attributes) {
     let svgTable = d3.select("#attributeTable")
     svgTable.selectAll("*").remove();
     svgTable = svgTable.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", tableWidth + tableMargin.left + tableMargin.right)
+        .attr("height", tableHeight + tableMargin.top + tableMargin.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + tableMargin.left + "," + tableMargin.top + ")");
     // appending an outline for the whole table
     svgTable.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", width)
+        .attr("width", tableWidth)
         .attr("height", heightElement*(data.length + 1))
         .attr("fill", "none")
         .attr("stroke", "black")
@@ -224,9 +224,9 @@ function renderTableOutline(tableData, data, attributes) {
     for (let i = 0; i < attributes.length; i++) {
         svgTable.append("rect")// headline elements for attributes
             .attr("id", attributes[i].id + "Headline")
-            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
+            .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * i)
             .attr("y", 0)
-            .attr("width", ((width - widthSong) / attributes.length))
+            .attr("width", ((tableWidth - widthSong) / attributes.length))
             .attr("height", heightElement)
             .attr("fill", "white")
             .attr("stroke-width", 2)
@@ -250,7 +250,7 @@ function renderTableOutline(tableData, data, attributes) {
             .style("text-anchor", "middle")
             .text(attributes[i].attribute)
             .attr("class", "tableHeadline")
-            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length) / 2)
+            .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * i + ((tableWidth - widthSong) / attributes.length) / 2)
             .attr("y", (heightElement - heightSortButton)/ 2)
             .attr("dominant-baseline", "central")
             .style("pointer-events", "none");
@@ -258,9 +258,9 @@ function renderTableOutline(tableData, data, attributes) {
         svgTable.append("rect")
             .attr("id", attributes[i].id + "up")
             .classed("sort-button", true)
-            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
+            .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * i)
             .attr("y", heightElement-heightSortButton)
-            .attr("width", ((width - widthSong) / attributes.length)/2)
+            .attr("width", ((tableWidth - widthSong) / attributes.length)/2)
             .attr("height", heightSortButton)
             .attr("fill", "white")
             .attr("stroke-width", 2)
@@ -288,7 +288,7 @@ function renderTableOutline(tableData, data, attributes) {
         svgTable.append("text")
             .attr("id", "text" + attributes[i].id + "up")
             .attr("class", "tableHeadline sortText")
-            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length)/4)
+            .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * i + ((tableWidth - widthSong) / attributes.length)/4)
             .attr("y", heightElement-heightSortButton/2)
             .style("text-anchor", "middle")
             .attr("dominant-baseline", "central")
@@ -298,9 +298,9 @@ function renderTableOutline(tableData, data, attributes) {
         svgTable.append("rect")
             .attr("id", attributes[i].id + "down")
             .classed("sort-button", true)
-            .attr("x", (widthSong + ((width - widthSong) / attributes.length) * (i+1)) - ((width - widthSong) / attributes.length)/2)
+            .attr("x", (widthSong + ((tableWidth - widthSong) / attributes.length) * (i+1)) - ((tableWidth - widthSong) / attributes.length)/2)
             .attr("y", heightElement-heightSortButton)
-            .attr("width", ((width - widthSong) / attributes.length)/2)
+            .attr("width", ((tableWidth - widthSong) / attributes.length)/2)
             .attr("height", heightSortButton)
             .attr("fill", "white")
             .attr("stroke-width", 2)
@@ -328,7 +328,7 @@ function renderTableOutline(tableData, data, attributes) {
         svgTable.append("text")
             .attr("id", "text" + attributes[i].id + "down")
             .attr("class", "tableHeadline sortText")
-            .attr("x", (widthSong + ((width - widthSong) / attributes.length) * (i+1)) - ((width - widthSong) / attributes.length)/4)
+            .attr("x", (widthSong + ((tableWidth - widthSong) / attributes.length) * (i+1)) - ((tableWidth - widthSong) / attributes.length)/4)
             .attr("y", heightElement-heightSortButton/2)
             .style("text-anchor", "middle")
             .attr("dominant-baseline", "central")
@@ -337,9 +337,9 @@ function renderTableOutline(tableData, data, attributes) {
         
         svgTable.append("rect")//higlight of the column
             .attr("id", attributes[i].id + "column")
-            .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
+            .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * i)
             .attr("y", 0)
-            .attr("width", ((width - widthSong) / attributes.length))
+            .attr("width", ((tableWidth - widthSong) / attributes.length))
             .attr("height", (data.length+1)*heightElement)
             .attr("fill", "none")
             .attr("stroke-width", 4)
@@ -353,12 +353,12 @@ function renderTableOutline(tableData, data, attributes) {
             svgTable.append("rect")
                 .attr("x", 0)
                 .attr("y", heightElement*2)
-                .attr("width", width)
+                .attr("width", tableWidth)
                 .attr("height", heightElement)
                 .attr("fill", "#fff3cd")
                 .attr("stroke-width", 2) 
             svgTable.append("text")
-                .attr("x", margin.left)
+                .attr("x", tableMargin.left)
                 .attr("y", heightElement*2 + heightElement/2)
                 .text("Select at least one other song for which you want to compare the attributes.")
                 .attr("fill", "#856404")
@@ -367,12 +367,12 @@ function renderTableOutline(tableData, data, attributes) {
             svgTable.append("rect")
                 .attr("x", 0)
                 .attr("y", heightElement*3)
-                .attr("width", width)
-                .attr("height", heightElement+ margin.bottom)
+                .attr("width", tableWidth)
+                .attr("height", heightElement+ tableMargin.bottom)
                 .attr("fill", "#fff3cd")
                 .attr("stroke-width", 2) 
             svgTable.append("text")
-                .attr("x", margin.left)
+                .attr("x", tableMargin.left)
                 .attr("y", heightElement*3 + heightElement/2)
                 .html(`<tspan dy="0">Note that the elements show how the attributes compare in the songselection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the table does not show the degree to which the values vary.</tspan>`)
                 .attr("fill", "#856404")
@@ -453,9 +453,9 @@ function renderTableData (svgTable, tableData, attributes){
             svgTable.append("rect")
                 .attr("id", attributes[j].id + " Row" + i)
                 .classed("valuesInTable", true)
-                .attr("x", widthSong + ((width - widthSong) / attributes.length) * j)
+                .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * j)
                 .attr("y", heightElement + heightElement * i)
-                .attr("width", ((width - widthSong) / attributes.length))
+                .attr("width", ((tableWidth - widthSong) / attributes.length))
                 .attr("height", heightElement)
                 .attr("fill", "black")
                 .attr("stroke-width", 2)
@@ -474,7 +474,7 @@ function renderTableData (svgTable, tableData, attributes){
                 .classed("valuesInTable tableHeadline" + " values" + attributes[j].id, true)
                 .style("text-anchor", "middle")
                 .text(tableData[i][attributes[j].arrayIndex])
-                .attr("x", widthSong + ((width - widthSong) / attributes.length) * (j + 0.5))
+                .attr("x", widthSong + ((tableWidth - widthSong) / attributes.length) * (j + 0.5))
                 .attr("y", heightElement + heightElement * (i + 0.5))
                 .attr("dominant-baseline", "central")
                 .style("visibility", "hidden")
@@ -491,7 +491,7 @@ function renderTableData (svgTable, tableData, attributes){
             .classed("valuesInTable", true)
             .attr("x", 0)
             .attr("y", heightElement + (heightElement * i))
-            .attr("width", width)
+            .attr("width", tableWidth)
             .attr("height", heightElement)
             .attr("fill", "none")
             .attr("stroke-width", 4)
@@ -512,7 +512,7 @@ const tooltipAttributes = d3.select("body")
     .style("pointer-events", "none");
 
 // Margin object with properties for the four directions
-const margin = {
+const tableMargin = {
     top: 5,
     right: 5,
     bottom: 5,
@@ -520,11 +520,11 @@ const margin = {
 };
 
 // Width and height as the inner dimensions of the chart area
-const width = 720 - margin.left - margin.right;
-const height = 450 - margin.top - margin.bottom;
+const tableWidth = 720 - tableMargin.left - tableMargin.right;
+const tableHeight = 450 - tableMargin.top - tableMargin.bottom;
 
 const widthSong = 150
-const heightElement = height / 11
+const heightElement = tableHeight / 11
 const heightSortButton = 15
 
 const renderTable = () => {

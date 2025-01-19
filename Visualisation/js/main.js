@@ -26,7 +26,6 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
-    renderGraphChart();
     renderTable();
     graphChart.updateVis();
     updateRankChart();
