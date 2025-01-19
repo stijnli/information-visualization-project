@@ -4,7 +4,17 @@ body{
     padding: 0;
 }
 
-.tableHeadline{
+.greyed{
+    color:grey;
+}
+
+.axis-label {
+    fill: #000;
+    font-size: 16px;
+    text-anchor: middle;
+  }
+
+  .tableHeadline{
     font-size: 12px
 }
 
