@@ -373,7 +373,7 @@ function renderTableOutline(tableData, data, attributes) {
             svgTable.append("text")
                 .attr("x", tableMargin.left)
                 .attr("y", heightElement*3 + heightElement/2)
-                .html(`<tspan dy="0">Note that the elements show how the attributes compare in the songselection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the table does not show the degree to which the values vary.</tspan>`)
+                .html(`<tspan dy="0">Note that the elements show how the attributes compare in the song selection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the table does not show the degree to which the values vary.</tspan>`)
                 .attr("fill", "#856404")
         }
     };
@@ -494,7 +494,7 @@ function renderTableData (svgTable, tableData, attributes){
             .attr("height", heightElement)
             .attr("fill", "none")
             .attr("stroke-width", 4)
-            .style("pointer-events", "none");
+            .style("pointer-events", "none")
     }
 }
 const tooltipAttributes = d3.select("body")
