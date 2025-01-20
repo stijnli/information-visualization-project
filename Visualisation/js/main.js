@@ -1,6 +1,6 @@
 // Define config variables
 const config = {
-    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00",  "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
+    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00", "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
     maxSelectedSongs: 10
 }
 
@@ -26,9 +26,15 @@ const setSelectedSongs = (newSelectedSongs) => {
 
     // Execute rerenders
     renderMusicSelection();
-    renderGraphChart();
+    if (graphChart !== undefined) {
+        graphChart.updateVis();
+    }
+    updateRankChart();
+    updateCountryDropdownMenu();
     renderTable();
 };
+
+let graphChart = undefined;
 
 let currentHoveredSongId = undefined;
 let oldHoveredSongOutlineColor = undefined;
@@ -36,12 +42,18 @@ const setCurrentHoveredSongId = (newSongId) => {
     const oldSongIsSelected = selectedSongs.some(song => song.id === currentHoveredSongId);
     // Update the border of the song image
     if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
-        if(oldSongIsSelected) {
-        document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
+        if (oldSongIsSelected) {
+            document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
         }
 
         // Change svg node stroke
-        document.getElementById("graphNode-" + currentHoveredSongId).style.stroke = oldHoveredSongOutlineColor
+        const graphElement = document.getElementById("graphNode-" + currentHoveredSongId);
+        if (graphElement !== null) {
+            graphElement.style.stroke = oldHoveredSongOutlineColor
+        }
+        if (document.getElementById(`rankchart-${currentHoveredSongId}`) !== null) {
+            document.querySelectorAll(`.pathLine:not(#rankchart-${currentHoveredSongId})`).forEach((elem) => elem.style.opacity = 1)
+        }
     }
 
     if (newSongId === undefined) {
@@ -56,7 +68,9 @@ const setCurrentHoveredSongId = (newSongId) => {
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
-
+        if (document.getElementById(`rankchart-${newSongId}`) !== null) {
+            document.querySelectorAll(`.pathLine:not(#rankchart-${newSongId})`).forEach((elem) => elem.style.opacity = 0.2)
+        }
         // Change svg node stroke
         graphNode = document.getElementById("graphNode-" + newSongId)
         oldHoveredSongOutlineColor = graphNode.style.stroke
@@ -108,12 +122,15 @@ const addSong = (songId) => {
     setSelectedSongs([...selectedSongs, newSong]);
 };
 
+const getSongColor = (id) => {
+    return selectedSongs.find(song => song.id === id)?.color;
+}
+
 const initializeLoad = () => {
     // Define data loading, try not to load the data multiple times.
     fetch('data/songs.json')
         .then(response => response.json())
         .then(songs => {
-            setSelectedSongs(songs.sort(() => 0.5 - Math.random()).slice(0, 5));
             setSongs(songs);
 
             let albumsMap = new Map();
@@ -126,13 +143,18 @@ const initializeLoad = () => {
             });
             albums = [...albumsMap.values()];
 
-        }).then(() => {
+        })
+        .then(() => {
             fetch('data/artists.json')
                 .then(response => response.json())
                 .then(artists => {
                     songsPerArtist = new Map();
                     albumsPerArtist = new Map();
+                    const allAlbums = new Map();
                     songs.forEach(song => {
+                        if (!allAlbums.has(song.album.id)) {
+                            allAlbums.set(song.album.id, song.album);
+                        }
                         song.artists.forEach(artist => {
                             if (!songsPerArtist.has(artist.id)) {
                                 songsPerArtist.set(artist.id, new Set());
@@ -153,15 +175,64 @@ const initializeLoad = () => {
                         artist.songs = [...songsPerArtist.get(artist.id) || new Set()];
                         artist.albums = [...albumsPerArtist.get(artist.id) || new Set()];
                     });
+                    const albums = [...allAlbums.values()];
                     setArtists(artists);
+                    graphChart = new GraphChart(songs, artists, albums, selectedSongs);
+                    graphChart.initVis();
                 });
+
+
         })
         .catch(error => console.error('Error loading data:', error));
 
+    d3.csv("data/measurements_full.csv", (d) => {
+        return {
+            spotify_id: d.spotify_id,
+            snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
+            daily_rank: d.daily_rank,
+            country: d.country,
+        };
+    })
+        .then((data) => {
+            setMeasurements(data);
+            setIntialSongSelection();
+
+            return fetch("data/alpha2ToCountryName.json");
+        })
+        .then((response) => response.json())
+        .then((alpha2ToCountryCode) => initCountryOptions(alpha2ToCountryCode));
+
+    function setIntialSongSelection() {
+        if (selectedSongs.length > 0) {
+            return true;
+        }
+        if (songs.length === 0 || measurements.length === 0) {
+            setTimeout(() => {
+                setIntialSongSelection();
+            }, 1000);
+        }
+        const rankPerSong = new Map();
+        measurements.forEach(measurement => {
+            if (!rankPerSong.has(measurement.spotify_id)) {
+                rankPerSong.set(measurement.spotify_id, 0);
+            }
+            rankPerSong.set(measurement.spotify_id, rankPerSong.get(measurement.spotify_id) + 51 - measurement.daily_rank)
+        });
+        const topSongs = [...rankPerSong.entries()].sort((a, b) => b[1] - a[1]).slice(0, 50);
+
+        // Sample 5 random song ids from the 5% top songs
+        const sample = [];
+        for (let i = 0; i < 5; i++) {
+            const randomIndex = Math.floor(Math.random() * topSongs.length);
+            sample.push(topSongs[randomIndex][0]);
+            topSongs.splice(randomIndex, 1);
+        }
+        setSelectedSongs(songs.filter(song => sample.includes(song.id)));
+    }
 
 
     renderMusicSelection();
-    renderGraphChart();
+    initRankChart();
 };
 
 

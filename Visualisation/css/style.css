@@ -11,3 +11,12 @@ body{
 .custom-tooltip{
     outline: 1px solid;
 }
+.greyed{
+    color:grey;
+}
+
+.axis-label {
+    fill: #000;
+    font-size: 16px;
+    text-anchor: middle;
+  }
