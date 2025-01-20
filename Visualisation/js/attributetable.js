@@ -415,7 +415,9 @@ function renderTableData(svgTable, tableData, attributes) {
             })
             .on("mouseleave", function () {
                 d3.select("#song" + currentHoveredSongId + "inTable").style("visibility", "visible");// shows the cropt static text
+                d3.select("#song" + currentHoveredSongId + "inTableScroll").remove();// removes the scrolling text
             });
+            
 
         songGroup.append("rect") // adding the box for the song title
             .attr("x", 0)
