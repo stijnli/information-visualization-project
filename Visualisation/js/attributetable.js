@@ -240,7 +240,7 @@ function renderTableOutline(tableData, data, attributes) {
             .on("mouseover", function () {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
                 d3.select("#" + attributes[i].id + "column").style("visibility", "visible");
-                tooltipAttributes.style("visibility", "visible").text(attributes[i].description + " (Source: Spotify)");
+                tooltipAttributes.style("visibility", "visible").text(attributes[i].description + " (Source: Spotify)")
             })
             .on("mousemove", function (event) {
                 // Update tooltip position
@@ -506,9 +506,11 @@ const tooltipAttributes = d3.select("body")
     .append("div")
     .attr("class", "custom-tooltip")
     .style("position", "absolute")
-    .style("background", "rgb(255, 255, 255)")
+    .style("background-color", "rgb(255, 255, 255)")
+    .style("z-index", "10")
     .style("color", "black")
     .style("padding", "10px")
+    .style("margin-left", "-100px")
     .style("font-size", "12px")
     .style("line-height", "1.5")
     .style("max-width", "200px") 

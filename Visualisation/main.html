@@ -35,7 +35,7 @@
 
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-md-3" style="background-color: lightblue;">
+			<div class="col-md-3" style="background-color: lightblue; height: 100vh;position:fixed;z-index: 30;" ?>
 				<!-- Content for the left column -->
 				<div class="container">
 					<div class="row">
@@ -47,7 +47,8 @@
 						<div class="col-12">
 							<h2>Selected songs</h2>
 							<div class="input-group" id="searchBar">
-								<input type="text" id="searchTerm" class="form-control" placeholder="Search for music..."
+								<input type="text" id="searchTerm" class="form-control"
+									placeholder="Search for music..."
 									oninput="setCurrentSearchTerm(document.getElementById('searchTerm').value)">
 							</div>
 							<div
@@ -65,6 +66,7 @@
 				</div>
 
 			</div>
+			<div class="col-md-3"></div>
 			<div class="col-md-9">
 				<div class="row" style="height: 500px;">
 					<div class="col-12">
@@ -78,13 +80,14 @@
 				</div>
 				<div class="row" style="height: 450px;">
 					<div class="col-6" id="rankChartCol">
-						        <p>
-                                    In the rank chart, you can see the ranking in the top 50, globally or in a specific country. You can use the dropdown to select a country.
-                                </p>
-						        <select style="float:right;" id="countrySelect" onchange="selectCountry(this.value)"></select>
+						<p>
+							In the rank chart, you can see the ranking in the top 50, globally or in a specific country.
+							You can use the dropdown to select a country.
+						</p>
+						<select style="float:right;" id="countrySelect" onchange="selectCountry(this.value)"></select>
 						<div id="rank_chart"></div>
 					</div>
-					<div class="col-6" id ="attributeTable">
+					<div class="col-6" id="attributeTable">
 
 					</div>
 				</div>
