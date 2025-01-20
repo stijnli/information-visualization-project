@@ -96,16 +96,18 @@ function renderLengthSong(svgObject, songTitle, songArtists){
 
 
 function makeScrolingSongTitle(svgObject, data, widthScroling, i) {
+    // Find the row index of the songId in data
+    
     let textElement = svgObject.append("g")
-        .attr("clip-path", "url(#clip-border" + i + ")")
+        .attr("clip-path", "url(#clip-border" + data[i][0] + ")")
         .append("text")
-        .attr("id", "song" + i + "inTableScroll")
+        .attr("id", "song" + data[i][0] + "inTableScroll")
         .attr("class", "scroll-container scroll-content")
         .attr("x", 5)
         .attr("y", heightElement + heightElement * i + heightElement / 4)
         .attr("dominant-baseline", "central")
         .on("mouseover", function () {
-            d3.select("#song" + i + "inTable").style("visibility", "hidden");
+            d3.select("#song" + data[i][0] + "inTable").style("visibility", "hidden");
         });
 
     textElement.append("tspan")
@@ -138,7 +140,10 @@ function renderTableOutline(tableData, data, attributes) {
         .attr("width", width + tableMargin.left + tableMargin.right)
         .attr("height", height + tableMargin.top + tableMargin.bottom)
         .append("g")
-        .attr("transform", "translate(" + tableMargin.left + "," + tableMargin.top + ")");
+        .attr("transform", "translate(" + tableMargin.left + "," + tableMargin.top + ")")
+        .on("mouseleave", function () {
+            setCurrentHoveredSongId(undefined); 
+        });
     // appending an outline for the whole table
     svgTable.append("rect")
         .attr("x", 0)
@@ -244,7 +249,7 @@ function renderTableOutline(tableData, data, attributes) {
             })
             .on("mousemove", function (event) {
                 // Update tooltip position
-                tooltipAttributes.style("top", (event.pageY + 10) + "px") // 10px offset for better visibility
+                tooltipAttributes.style("bottom", (window.innerHeight - event.pageY) + "px") // Adjusted to height - event.pageY
                     .style("left", (event.pageX + 10) + "px");
             })
             .on("mouseout", function () {
@@ -384,12 +389,15 @@ function renderTableOutline(tableData, data, attributes) {
     };
     return svgTable;
 }
-function renderTableData (svgTable, tableData, attributes){
+function renderTableData(svgTable, tableData, attributes) {
     // making the table grid and append the values to the table
     svgTable.selectAll(".valuesInTable").remove();
+
     for (let i = 0; i < tableData.length; i++) {
+        const songId = tableData[i][0];
+
         svgTable.append("clipPath")// for the scrolling text while hovering over one specific song
-            .attr("id", "clip-border" + i)
+            .attr("id", "clip-border" + songId)
             .classed("valuesInTable", true)
             .append("rect")
             .attr("x", 45)
@@ -397,65 +405,44 @@ function renderTableData (svgTable, tableData, attributes){
             .attr("width", widthSong - 50)
             .attr("height", heightElement);
 
-        svgTable.append("rect") // addig the box for the song title
-            .attr("class", "songInTable Row" + i)
+        const songGroup = svgTable.append("g")
+            .attr("class", "songInTable Row" + songId)
             .classed("valuesInTable", true)
+            .on("mouseenter", function () {
+                setCurrentHoveredSongId(songId);
+                d3.select("#song" + songId + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
+                makeScrolingSongTitle(songGroup, tableData, widthSong - 40, i); //places the scrolling song title
+            })
+            .on("mouseleave", function () {
+                d3.select("#song" + currentHoveredSongId + "inTable").style("visibility", "visible");// shows the cropt static text
+            });
+
+        songGroup.append("rect") // adding the box for the song title
             .attr("x", 0)
             .attr("y", heightElement + heightElement * i)
             .attr("width", widthSong)
             .attr("height", heightElement)
             .attr("fill", "white")
             .attr("stroke-width", 2)
-            .attr("stroke","black")
-            .on("mouseover", function () {
-                d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
-                d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong-40, i); //places the scrolling song title
-            })
-            .on("mouseout", function () {
-                d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
-                d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
-                d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
-            });
-        
+            .attr("stroke", "black");
 
-        svgTable.append("text")// append static title to first collunm
-            .attr("id", "song" + i + "inTable")
-            .classed("valuesInTable", true)
+        songGroup.append("text") // append static title to first column
+            .attr("id", "song" + songId + "inTable")
             .attr("x", 45)
             .attr("y", heightElement + heightElement * i + heightElement / 4)
             .attr("dominant-baseline", "central")
-            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong-45)}</tspan><br><tspan class="card-text" x="45" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong-45)}</tspan>`)
-            .on("mouseover", function () {
-                d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
-                d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong-40, i); //places the scrolling song title
-            })
-            .on("mouseout", function () {
-                d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
-                d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
-                d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
-            });
-        svgTable.append("rect")
+            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong - 45)}</tspan><br><tspan class="card-text" x="45" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong - 45)}</tspan>`);
+
+        songGroup.append("rect") // adding the color box
             .attr("x", 0)
             .attr("y", heightElement + heightElement * i)
             .attr("width", 40)
             .attr("height", heightElement)
-            .attr("fill", tableData[i][11])
-            .on("mouseover", function () {
-                d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
-                d3.select("#song" + i + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(svgTable, tableData, widthSong-40, i); //places the scrolling song title
-            })
-            .on("mouseout", function () {
-                d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
-                d3.select("#song" + i + "inTable").style("visibility", "visible");// shows the cropt static text
-                d3.select("#song" + i + "inTableScroll").remove();// removes the scrolling text
-            });
+            .attr("fill", tableData[i][11]);
 
         for (let j = 0; j < attributes.length; j++) {
             svgTable.append("rect")
-                .attr("id", attributes[j].id + " Row" + i)
+                .attr("id", attributes[j].id + " Row" + songId)
                 .classed("valuesInTable", true)
                 .attr("x", widthSong + ((width - widthSong) / attributes.length) * j)
                 .attr("y", heightElement + heightElement * i)
@@ -466,15 +453,15 @@ function renderTableData (svgTable, tableData, attributes){
                 .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
                 .attr("stroke", "none")
                 .on("mouseover", function () {
-                    d3.select("#Row" + i + "highlight").attr("stroke", tableData[i][11]).style("visibility", "visible");
-                    d3.select("#" + attributes[j].id + "Row" + i + "value").style("visibility", "visible");
+                    d3.select("#Row" + songId + "highlight").attr("stroke", tableData[i][11]).style("visibility", "visible");
+                    d3.select("#" + attributes[j].id + "Row" + songId + "value").style("visibility", "visible");
                 })
                 .on("mouseout", function () {
-                    d3.select("#Row" + i + "highlight").style("visibility", "hidden"); // removes row higlighting
-                    d3.select("#" + attributes[j].id + "Row" + i + "value").style("visibility", "hidden");
+                    d3.select("#Row" + songId + "highlight").style("visibility", "hidden"); // removes row highlighting
+                    d3.select("#" + attributes[j].id + "Row" + songId + "value").style("visibility", "hidden");
                 });
             svgTable.append("text")
-                .attr("id", attributes[j].id + "Row" + i + "value")
+                .attr("id", attributes[j].id + "Row" + songId + "value")
                 .classed("valuesInTable tableHeadline" + " values" + attributes[j].id, true)
                 .style("text-anchor", "middle")
                 .text(tableData[i][attributes[j].arrayIndex])
@@ -483,15 +470,14 @@ function renderTableData (svgTable, tableData, attributes){
                 .attr("dominant-baseline", "central")
                 .style("visibility", "hidden")
                 .style("pointer-events", "none");
-            if (attributes[j].scale(tableData[i][attributes[j].arrayIndex]) < 0.5){
-                d3.select("#" + attributes[j].id + "Row" + i + "value").attr("fill", "black");  
-            }
-            else{
-                d3.select("#" + attributes[j].id + "Row" + i + "value").attr("fill", "white");
+            if (attributes[j].scale(tableData[i][attributes[j].arrayIndex]) < 0.5) {
+                d3.select("#" + attributes[j].id + "Row" + songId + "value").attr("fill", "black");
+            } else {
+                d3.select("#" + attributes[j].id + "Row" + songId + "value").attr("fill", "white");
             }
         }
-        svgTable.append("rect")// adding box for higlighting a row when on hover
-            .attr("id", "Row" + i + "highlight")
+        svgTable.append("rect")// adding box for highlighting a row when on hover
+            .attr("id", "Row" + songId + "highlight")
             .classed("valuesInTable", true)
             .attr("x", 0)
             .attr("y", heightElement + (heightElement * i))
@@ -502,6 +488,7 @@ function renderTableData (svgTable, tableData, attributes){
             .style("pointer-events", "none");
     }
 }
+
 const tooltipAttributes = d3.select("body")
     .append("div")
     .attr("class", "custom-tooltip")

@@ -40,8 +40,13 @@ let currentHoveredSongId = undefined;
 let oldHoveredSongOutlineColor = undefined;
 const setCurrentHoveredSongId = (newSongId) => {
     const oldSongIsSelected = selectedSongs.some(song => song.id === currentHoveredSongId);
+    console.log(`Changing hovered song from ${currentHoveredSongId} to ${newSongId}`);
+    if (currentHoveredSongId === newSongId) {
+        return;
+    }
+
     // Update the border of the song image
-    if (currentHoveredSongId !== undefined && currentHoveredSongId !== newSongId) {
+    if (currentHoveredSongId !== undefined) {
         if (oldSongIsSelected) {
             document.getElementById(`musicSelection-${currentHoveredSongId}Image`).style.border = `8px solid ${selectedSongs.find(song => song.id === currentHoveredSongId).color}`;
         }
@@ -54,17 +59,26 @@ const setCurrentHoveredSongId = (newSongId) => {
         if (document.getElementById(`rankchart-${currentHoveredSongId}`) !== null) {
             document.querySelectorAll(`.pathLine:not(#rankchart-${currentHoveredSongId})`).forEach((elem) => elem.style.opacity = 1)
         }
-    }
 
+        d3.select("#Row" + currentHoveredSongId + "highlight").style("visibility", "hidden"); // removes row higlighting
+        d3.select("#song" + currentHoveredSongId + "inTableScroll").remove();// removes the scrolling text
+        
+    }
+    currentHoveredSongId = newSongId    
+    
     if (newSongId === undefined) {
+
         return;
     }
 
     const songIsSelected = selectedSongs.some(song => song.id === newSongId);
 
     if (!songIsSelected) {
+        
         return;
     }
+
+    const selectedSong = selectedSongs.find(song => song.id === newSongId);
 
     if (newSongId !== undefined) {
         document.getElementById(`musicSelection-${newSongId}Image`).style.border = '8px solid #000000';
@@ -76,9 +90,13 @@ const setCurrentHoveredSongId = (newSongId) => {
         oldHoveredSongOutlineColor = graphNode.style.stroke
         graphNode.style.stroke = "black"
 
+        
+        // highlight the song in the attribute table
+        d3.select("#Row" + newSongId + "highlight").attr("stroke",selectedSong.color ).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
+
+
     }
 
-    currentHoveredSongId = newSongId
 }
 
 
