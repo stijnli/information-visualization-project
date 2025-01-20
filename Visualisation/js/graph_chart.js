@@ -7,7 +7,7 @@ class GraphChart {
         this.oldNodes = [];
         this.width = 1200;
         this.height = 400;
-        this.legendWidth = 100;
+        this.legendWidth = 200;
         this.element = d3.select('#graphChart');
     }
 
