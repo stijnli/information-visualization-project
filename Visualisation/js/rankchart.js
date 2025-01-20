@@ -30,9 +30,9 @@ const oneDay = 86400000;
 const noDataMessage = 'No Ranking data found for selected songs. Select different songs or choose a different country in the dropdown below.'
 
 // set the dimensions and margins of the graph
-const margin = { top: 10, right: 30, bottom: 70, left: 60 };
-const width = 550 - margin.left - margin.right;
-const height = 450 - margin.top - margin.bottom;
+const chartMargin = { top: 10, right: 30, bottom: 70, left: 60 };
+const chartWidth = 550 - chartMargin.left - chartMargin.right;
+const chartHeight = 450 - chartMargin.top - chartMargin.bottom;
 
 function setMeasurements(data) {
     measurements = data;
@@ -128,26 +128,26 @@ function initRankChart() {
     svg = d3
         .select("#rank_chart")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", chartWidth + chartMargin.left + chartMargin.right)
+        .attr("height", chartHeight + chartMargin.top + chartMargin.bottom)
         .attr("id", "rankChartSVG");
 
     g = svg.append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        .attr("transform", `translate(${chartMargin.left}, ${chartMargin.top})`);
 
     g.append('clipPath')
         .attr('id', 'clipRect')
         .append('rect')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('width', width)
-            .attr('height', height);
+            .attr('width', chartWidth)
+            .attr('height', chartHeight);
 
     rectOverlay = g.append('rect')
         .attr('x', 0)
         .attr('y', 0)
-        .attr('width', width)
-        .attr('height', height)
+        .attr('width', chartWidth)
+        .attr('height', chartHeight)
         .attr("opacity", "0")
         .attr('pointer-events', 'all')
         .on('mousemove', (event) => pointerMoved(event))
@@ -313,11 +313,11 @@ function updateRankChart() {
         .scaleTime()
         .domain([new Date(xExtend[0].getTime() - oneDay), xExtend[1]])
         .nice()
-        .range([0, width]);
+        .range([0, chartWidth]);
     xAxis = g
         .append("g")
         .attr("class", "axis")
-        .attr("transform", `translate(0, ${height})`)
+        .attr("transform", `translate(0, ${chartHeight})`)
         .call(d3.axisBottom(x));
 
     xAxis.selectAll("text")  
@@ -329,11 +329,11 @@ function updateRankChart() {
     xAxis.append('text')
     .attr('class', 'axis-label')
     .text('Time')
-    .attr('x', margin.left + (width - margin.left - margin.right) / 2)
+    .attr('x', chartMargin.left + (chartWidth - chartMargin.left - chartMargin.right) / 2)
     .attr('y', 55) // Relative to the x axis.
 
     // Scale the y-axis for ranking 1-50
-    y = d3.scaleLinear().domain([50, 0]).range([height, 0]);
+    y = d3.scaleLinear().domain([50, 0]).range([chartHeight, 0]);
     yAxis = g
     .append("g")
     .attr("class", "axis")
@@ -342,7 +342,7 @@ function updateRankChart() {
     .attr('class', 'axis-label')
     .text('Ranking in the Top 50')
     .attr('transform', 'rotate(-90)')
-    .attr('x', -(margin.top + (height - margin.top - margin.bottom) / 2))
+    .attr('x', -(chartMargin.top + (chartHeight - chartMargin.top - chartMargin.bottom) / 2))
     .attr('y', -40) // Relative to the y axis.
 
     // Draw the ranking lines
@@ -379,7 +379,7 @@ function pointerMoved(event) {
     let songsOnTheLine = selectedSongMeasurements.filter(d => d.snapshot_date.getTime() === closestDate.getTime());
 
     let mouseLineXCoord = x(closestDate);
-    mouseLine.attr("d", `M ${mouseLineXCoord} 0 V ${height}`).attr("opacity", "1");
+    mouseLine.attr("d", `M ${mouseLineXCoord} 0 V ${chartHeight}`).attr("opacity", "1");
     
     tooltipText.selectAll(".tooltip-text-line").remove();
     g.selectAll(".tooltip-line-circles").remove();

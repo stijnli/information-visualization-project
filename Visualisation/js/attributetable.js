@@ -1,5 +1,14 @@
+// Margin object with properties for the four directions
+const tableMargin = {
+    top: 5,
+    right: 5,
+    bottom: 5,
+    left: 5
+};
+
 /// --- prepDataTable takes the raw data and prepares in an array; 
 // the index of each element in tempRow is used in the objects of "attributes" as "arrayIndex" 
+
 function prepDataTable(data) {
     let Rows = [];
     let tempRow = [];
@@ -17,7 +26,6 @@ function prepDataTable(data) {
         data[i].loudness,
         data[i].color];
         Rows.push(tempRow);
-        console.log(Rows[i]);
     }
     return Rows;
 }
@@ -127,10 +135,10 @@ function renderTableOutline(tableData, data, attributes) {
     let svgTable = d3.select("#attributeTable")
     svgTable.selectAll("*").remove();
     svgTable = svgTable.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", width + tableMargin.left + tableMargin.right)
+        .attr("height", height + tableMargin.top + tableMargin.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + tableMargin.left + "," + tableMargin.top + ")");
     // appending an outline for the whole table
     svgTable.append("rect")
         .attr("x", 0)
@@ -175,7 +183,6 @@ function renderTableOutline(tableData, data, attributes) {
               d3.select("#textSongup").attr("fill", "white");
               //sorting the data
             let sortedData = sortTable(tableData, 1, "asc");
-            console.log("sorted", sortedData);
             renderTableData(svgTable, sortedData, attributes);
         });
         
@@ -208,7 +215,6 @@ function renderTableOutline(tableData, data, attributes) {
             d3.select("#textSongdown").attr("fill", "white");
             //sorting the data
             let sortedData = sortTable(tableData, 1, "desc");
-            console.log("sorted", sortedData);
             renderTableData(svgTable, sortedData, attributes);
         });
     svgTable.append("text")
@@ -274,7 +280,6 @@ function renderTableOutline(tableData, data, attributes) {
                 d3.select("#text"+ attributes[i].id + "up").attr("fill", "white");
                 //sorting the data
                 let sortedData = sortTable(tableData, attributes[i].arrayIndex, "asc");
-                console.log("sorted", sortedData);
                 renderTableData(svgTable, sortedData, attributes);
             })
             .on("mouseover", function () {
@@ -314,7 +319,6 @@ function renderTableOutline(tableData, data, attributes) {
                 d3.select("#text"+ attributes[i].id + "down").attr("fill", "white");
                 //sorting the data
                 let sortedData = sortTable(tableData, attributes[i].arrayIndex, "desc");
-                console.log("sorted", sortedData);
                 renderTableData(svgTable, sortedData, attributes);
             })
             .on("mouseover", function () {
@@ -358,7 +362,7 @@ function renderTableOutline(tableData, data, attributes) {
                 .attr("fill", "#fff3cd")
                 .attr("stroke-width", 2) 
             svgTable.append("text")
-                .attr("x", margin.left)
+                .attr("x", tableMargin.left)
                 .attr("y", heightElement*2 + heightElement/2)
                 .text("Select at least one other song for which you want to compare the attributes.")
                 .attr("fill", "#856404")
@@ -368,11 +372,11 @@ function renderTableOutline(tableData, data, attributes) {
                 .attr("x", 0)
                 .attr("y", heightElement*3)
                 .attr("width", width)
-                .attr("height", heightElement+ margin.bottom)
+                .attr("height", heightElement+ tableMargin.bottom)
                 .attr("fill", "#fff3cd")
                 .attr("stroke-width", 2) 
             svgTable.append("text")
-                .attr("x", margin.left)
+                .attr("x", tableMargin.left)
                 .attr("y", heightElement*3 + heightElement/2)
                 .html(`<tspan dy="0">Note that the elements show how the attributes compare in the songselection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the table does not show the degree to which the values vary.</tspan>`)
                 .attr("fill", "#856404")
@@ -511,17 +515,11 @@ const tooltipAttributes = d3.select("body")
     .style("visibility", "hidden")
     .style("pointer-events", "none");
 
-// Margin object with properties for the four directions
-const margin = {
-    top: 5,
-    right: 5,
-    bottom: 5,
-    left: 5
-};
+
 
 // Width and height as the inner dimensions of the chart area
-const width = 720 - margin.left - margin.right;
-const height = 450 - margin.top - margin.bottom;
+const width = 700 - tableMargin.left - tableMargin.right;
+const height = 450 - tableMargin.top - tableMargin.bottom;
 
 const widthSong = 150
 const heightElement = height / 11
