@@ -17,7 +17,7 @@ SpotiVis provides a visualisation showing a full year of Spotify top 50 charts f
 *TODO*
 
 ## Prerequisites for Running SpotiVis
-1. Download the wrangled and prepared data from [this link](https://solisservices-my.sharepoint.com/:f:/g/personal/k_schoemaker_students_uu_nl/EtGpL1fvsS1PiKsTREwSUgYBQmdkLbmGVLIAG0MbeTVLZA?e=c0umGA).
+1. Download the wrangled and prepared data from [this link](https://solisservices-my.sharepoint.com/:f:/g/personal/s_j_d_lievaart_students_uu_nl/EsnOkMxa9iBMgjGCxXGu8b0BvjOsVQQl7Djd5c0afCo5AQ?e=ytYOfe)
 2. Unzip the data and place the files in the `\data`directory
 - Make sure `alpha2ToCountryName.json`, `artists.json`, `measurements.csv` and `songs.json` all exist
 4. From the `Visualization` directory, use Docker to build the image and run the container.
