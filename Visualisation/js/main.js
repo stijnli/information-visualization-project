@@ -203,7 +203,7 @@ const initializeLoad = () => {
         })
         .catch(error => console.error('Error loading data:', error));
 
-    d3.csv("data/measurements_full.csv", (d) => {
+    d3.csv("data/measurements.csv", (d) => {
         return {
             spotify_id: d.spotify_id,
             snapshot_date: d3.timeParse("%Y-%m-%d")(d.snapshot_date),
