@@ -1,15 +1,15 @@
 // Margin object with properties for the four directions
-const tableMargin = {
+const heatmapMargin = {
     top: 5,
     right: 5,
     bottom: 5,
     left: 5
 };
 
-/// --- prepDataTable takes the raw data and prepares in an array; 
+/// --- prepDataHeatmap takes the raw data and prepares in an array; 
 // the index of each element in tempRow is used in the objects of "attributes" as "arrayIndex" 
 
-function prepDataTable(data) {
+function prepDataHeatmap(data) {
     let Rows = [];
     let tempRow = [];
     for (let i = 0; i < data.length; i++) {
@@ -30,7 +30,7 @@ function prepDataTable(data) {
     return Rows;
 }
 
-function sortTable(data, keyToAttribute, sortDirection){
+function sortHeatmap(data, keyToAttribute, sortDirection){
   data.sort((a, b) => {
         if (typeof a[keyToAttribute] === "string") {
             // Compare strings
@@ -101,13 +101,13 @@ function makeScrolingSongTitle(svgObject, data, widthScroling, i) {
     let textElement = svgObject.append("g")
         .attr("clip-path", "url(#clip-border" + data[i][0] + ")")
         .append("text")
-        .attr("id", "song" + data[i][0] + "inTableScroll")
+        .attr("id", "song" + data[i][0] + "inHeatmapScroll")
         .attr("class", "scroll-container scroll-content")
         .attr("x", 5)
         .attr("y", heightElement + heightElement * i + heightElement / 4)
         .attr("dominant-baseline", "central")
         .on("mouseover", function () {
-            d3.select("#song" + data[i][0] + "inTable").style("visibility", "hidden");
+            d3.select("#song" + data[i][0] + "inHeatmap").style("visibility", "hidden");
         });
 
     textElement.append("tspan")
@@ -133,27 +133,27 @@ function makeScrolingSongTitle(svgObject, data, widthScroling, i) {
         .attr("repeatCount", "indefinite"); // Infinite scrolling
 }
 
-function renderTableOutline(tableData, data, attributes) {
-    let svgTable = d3.select("#attributeTable")
-    svgTable.selectAll("*").remove();
-    svgTable = svgTable.append("svg")
-        .attr("width", width + tableMargin.left + tableMargin.right)
-        .attr("height", height + tableMargin.top + tableMargin.bottom)
+function renderHeatmapOutline(heatmapData, data, attributes) {
+    let svgHeatmap = d3.select("#heatmap")
+    svgHeatmap.selectAll("*").remove();
+    svgHeatmap = svgHeatmap.append("svg")
+        .attr("width", width + heatmapMargin.left + heatmapMargin.right)
+        .attr("height", height + heatmapMargin.top + heatmapMargin.bottom)
         .append("g")
-        .attr("transform", "translate(" + tableMargin.left + "," + tableMargin.top + ")")
+        .attr("transform", "translate(" + heatmapMargin.left + "," + heatmapMargin.top + ")")
         .on("mouseleave", function () {
             setCurrentHoveredSongId(undefined); 
         });
-    // appending an outline for the whole table
-    svgTable.append("rect")
+    // appending an outline for the whole heatmap
+    svgHeatmap.append("rect")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", width)
         .attr("height", heightElement*(data.length + 1))
         .attr("fill", "none")
         .attr("stroke", "black")
-    // appending the headline of the table
-    svgTable.append("rect")
+    // appending the headline of the heatmap
+    svgHeatmap.append("rect")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", widthSong)
@@ -161,15 +161,15 @@ function renderTableOutline(tableData, data, attributes) {
         .attr("fill", "none")
         .attr("stroke-width", 2)
         .attr("stroke", "black")
-    svgTable.append("text")
+    svgHeatmap.append("text")
         .style("text-anchor", "middle")
         .text("Song")
-        .attr("class", "tableHeadline")
+        .attr("class", "headmapHeadline")
         .attr("id", "songnameHeadline")
         .attr("x", widthSong / 2)
         .attr("y", (heightElement - heightSortButton) / 2)
         .attr("dominant-baseline", "central");
-    svgTable.append("rect")//sort button up song
+    svgHeatmap.append("rect")//sort button up song
         .attr("id", "songup")
         .classed("sort-button", true)
         .attr("x", 0)
@@ -181,19 +181,19 @@ function renderTableOutline(tableData, data, attributes) {
         .attr("stroke", "black")
         .on("click", function(){
               //reset of buttons
-              svgTable.selectAll(".sort-button").attr("fill", "white");
+              svgHeatmap.selectAll(".sort-button").attr("fill", "white");
               d3.selectAll(".sortText").attr("fill", "black");
               //setting the selected buttton
               d3.select("#songup").attr("fill", "black");
               d3.select("#textSongup").attr("fill", "white");
               //sorting the data
-            let sortedData = sortTable(tableData, 1, "asc");
-            renderTableData(svgTable, sortedData, attributes);
+            let sortedData = sortHeatmap(heatmapData, 1, "asc");
+            renderHeatmapData(svgHeatmap, sortedData, attributes);
         });
         
-    svgTable.append("text")
+    svgHeatmap.append("text")
         .attr("id", "textSongup")
-        .attr("class", "tableHeadline sortText")
+        .attr("class", "headmapHeadline sortText")
         .attr("x", widthSong/4)
         .attr("y", heightElement-heightSortButton/2)
         .style("text-anchor", "middle")
@@ -201,7 +201,7 @@ function renderTableOutline(tableData, data, attributes) {
         .text("ascending")
         .style("pointer-events", "none");
        
-    svgTable.append("rect")//sort button down song
+    svgHeatmap.append("rect")//sort button down song
         .attr("id", "songdown")
         .classed("sort-button", true)
         .attr("x", widthSong/2)
@@ -213,18 +213,18 @@ function renderTableOutline(tableData, data, attributes) {
         .attr("stroke", "black")
         .on("click", function(){
             //reset of buttons
-            svgTable.selectAll(".sort-button").attr("fill", "white");
+            svgHeatmap.selectAll(".sort-button").attr("fill", "white");
             d3.selectAll(".sortText").attr("fill", "black");
             //setting the selected buttton
             d3.select("#songdown").attr("fill", "black");
             d3.select("#textSongdown").attr("fill", "white");
             //sorting the data
-            let sortedData = sortTable(tableData, 1, "desc");
-            renderTableData(svgTable, sortedData, attributes);
+            let sortedData = sortHeatmap(heatmapData, 1, "desc");
+            renderHeatmapData(svgHeatmap, sortedData, attributes);
         });
-    svgTable.append("text")
+    svgHeatmap.append("text")
         .attr("id", "textSongdown")
-        .attr("class", "tableHeadline sortText")
+        .attr("class", "headmapHeadline sortText")
         .attr("x", 3*widthSong/4)
         .attr("y", heightElement-heightSortButton/2)
         .style("text-anchor", "middle")
@@ -233,7 +233,7 @@ function renderTableOutline(tableData, data, attributes) {
         .style("pointer-events", "none");
 
     for (let i = 0; i < attributes.length; i++) {
-        svgTable.append("rect")// headline elements for attributes
+        svgHeatmap.append("rect")// headline elements for attributes
             .attr("id", attributes[i].id + "Headline")
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
             .attr("y", 0)
@@ -257,16 +257,16 @@ function renderTableOutline(tableData, data, attributes) {
                 d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
                 tooltipAttributes.style("visibility", "hidden");
             });
-        svgTable.append("text")
+        svgHeatmap.append("text")
             .style("text-anchor", "middle")
             .text(attributes[i].attribute)
-            .attr("class", "tableHeadline")
+            .attr("class", "headmapHeadline")
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length) / 2)
             .attr("y", (heightElement - heightSortButton)/ 2)
             .attr("dominant-baseline", "central")
             .style("pointer-events", "none");
         
-        svgTable.append("rect")
+        svgHeatmap.append("rect")
             .attr("id", attributes[i].id + "up")
             .classed("sort-button", true)
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
@@ -278,14 +278,14 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("stroke", "black")
             .on("click", function(){
                 //reset of buttons
-                svgTable.selectAll(".sort-button").attr("fill", "white");
+                svgHeatmap.selectAll(".sort-button").attr("fill", "white");
                 d3.selectAll(".sortText").attr("fill", "black");
                 //setting the selected buttton
                 d3.select("#" + attributes[i].id + "up").attr("fill", "black");
                 d3.select("#text"+ attributes[i].id + "up").attr("fill", "white");
                 //sorting the data
-                let sortedData = sortTable(tableData, attributes[i].arrayIndex, "asc");
-                renderTableData(svgTable, sortedData, attributes);
+                let sortedData = sortHeatmap(heatmapData, attributes[i].arrayIndex, "asc");
+                renderHeatmapData(svgHeatmap, sortedData, attributes);
             })
             .on("mouseover", function () {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
@@ -295,9 +295,9 @@ function renderTableOutline(tableData, data, attributes) {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "hidden");
                 d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
             });
-        svgTable.append("text")
+        svgHeatmap.append("text")
             .attr("id", "text" + attributes[i].id + "up")
-            .attr("class", "tableHeadline sortText")
+            .attr("class", "headmapHeadline sortText")
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i + ((width - widthSong) / attributes.length)/4)
             .attr("y", heightElement-heightSortButton/2)
             .style("text-anchor", "middle")
@@ -305,7 +305,7 @@ function renderTableOutline(tableData, data, attributes) {
             .text("asc")
             .style("pointer-events", "none");
         
-        svgTable.append("rect")
+        svgHeatmap.append("rect")
             .attr("id", attributes[i].id + "down")
             .classed("sort-button", true)
             .attr("x", (widthSong + ((width - widthSong) / attributes.length) * (i+1)) - ((width - widthSong) / attributes.length)/2)
@@ -317,14 +317,14 @@ function renderTableOutline(tableData, data, attributes) {
             .attr("stroke", "black")
             .on("click", function(){
                 //reset of buttons
-                svgTable.selectAll(".sort-button").attr("fill", "white");
+                svgHeatmap.selectAll(".sort-button").attr("fill", "white");
                 d3.selectAll(".sortText").attr("fill", "black");
                 //setting the selected buttton
                 d3.select("#" + attributes[i].id + "down").attr("fill", "black");
                 d3.select("#text"+ attributes[i].id + "down").attr("fill", "white");
                 //sorting the data
-                let sortedData = sortTable(tableData, attributes[i].arrayIndex, "desc");
-                renderTableData(svgTable, sortedData, attributes);
+                let sortedData = sortHeatmap(heatmapData, attributes[i].arrayIndex, "desc");
+                renderHeatmapData(svgHeatmap, sortedData, attributes);
             })
             .on("mouseover", function () {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "visible");
@@ -334,9 +334,9 @@ function renderTableOutline(tableData, data, attributes) {
                 d3.selectAll(".values" + attributes[i].id).style("visibility", "hidden");
                 d3.select("#" + attributes[i].id + "column").style("visibility", "hidden");
             });
-        svgTable.append("text")
+        svgHeatmap.append("text")
             .attr("id", "text" + attributes[i].id + "down")
-            .attr("class", "tableHeadline sortText")
+            .attr("class", "headmapHeadline sortText")
             .attr("x", (widthSong + ((width - widthSong) / attributes.length) * (i+1)) - ((width - widthSong) / attributes.length)/4)
             .attr("y", heightElement-heightSortButton/2)
             .style("text-anchor", "middle")
@@ -344,7 +344,7 @@ function renderTableOutline(tableData, data, attributes) {
             .text("desc")
             .style("pointer-events", "none");
         
-        svgTable.append("rect")//higlight of the column
+        svgHeatmap.append("rect")//higlight of the column
             .attr("id", attributes[i].id + "column")
             .attr("x", widthSong + ((width - widthSong) / attributes.length) * i)
             .attr("y", 0)
@@ -356,66 +356,66 @@ function renderTableOutline(tableData, data, attributes) {
             .style("visibility", "hidden")
         // handling length song selection < 2
         if (data.length == 0){
-            svgTable.selectAll("*").remove();
+            svgHeatmap.selectAll("*").remove();
         }
         if (data.length == 1){
-            svgTable.append("rect")
+            svgHeatmap.append("rect")
                 .attr("x", 0)
                 .attr("y", heightElement*2)
                 .attr("width", width)
                 .attr("height", heightElement)
                 .attr("fill", "#fff3cd")
                 .attr("stroke-width", 2) 
-            svgTable.append("text")
-                .attr("x", tableMargin.left)
+            svgHeatmap.append("text")
+                .attr("x", heatmapMargin.left)
                 .attr("y", heightElement*2 + heightElement/2)
                 .text("Select at least one other song for which you want to compare the attributes.")
                 .attr("fill", "#856404")
         }
         if (data.length == 2){
-            svgTable.append("rect")
+            svgHeatmap.append("rect")
                 .attr("x", 0)
                 .attr("y", heightElement*3)
                 .attr("width", width)
-                .attr("height", heightElement+ tableMargin.bottom)
+                .attr("height", heightElement+ heatmapMargin.bottom)
                 .attr("fill", "#fff3cd")
                 .attr("stroke-width", 2) 
-            svgTable.append("text")
-                .attr("x", tableMargin.left)
+            svgHeatmap.append("text")
+                .attr("x", heatmapMargin.left)
                 .attr("y", heightElement*3 + heightElement/2)
-                .html(`<tspan dy="0">Note that the elements show how the attributes compare in the songselection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the table does not show the degree to which the values vary.</tspan>`)
+                .html(`<tspan dy="0">Note that the elements show how the attributes compare in the songselection</tspan><br><tspan x="5" dy="1.2em">With two songs selected, the heatmap does not show the degree to which the values vary.</tspan>`)
                 .attr("fill", "#856404")
         }
     };
-    return svgTable;
+    return svgHeatmap;
 }
-function renderTableData(svgTable, tableData, attributes) {
-    // making the table grid and append the values to the table
-    svgTable.selectAll(".valuesInTable").remove();
+function renderHeatmapData(svgHeatmap, heatmapData, attributes) {
+    // making the heatmap grid and append the values to the heatmap
+    svgHeatmap.selectAll(".valuesInHeatmap").remove();
 
-    for (let i = 0; i < tableData.length; i++) {
-        const songId = tableData[i][0];
+    for (let i = 0; i < heatmapData.length; i++) {
+        const songId = heatmapData[i][0];
 
-        svgTable.append("clipPath")// for the scrolling text while hovering over one specific song
+        svgHeatmap.append("clipPath")// for the scrolling text while hovering over one specific song
             .attr("id", "clip-border" + songId)
-            .classed("valuesInTable", true)
+            .classed("valuesInHeatmap", true)
             .append("rect")
             .attr("x", 45)
             .attr("y", heightElement + heightElement * i)
             .attr("width", widthSong - 50)
             .attr("height", heightElement);
 
-        const songGroup = svgTable.append("g")
-            .attr("class", "songInTable Row" + songId)
-            .classed("valuesInTable", true)
+        const songGroup = svgHeatmap.append("g")
+            .attr("class", "songInHeatmap Row" + songId)
+            .classed("valuesInHeatmap", true)
             .on("mouseenter", function () {
                 setCurrentHoveredSongId(songId);
-                d3.select("#song" + songId + "inTable").style("visibility", "hidden"); // hides the cropped static song titles
-                makeScrolingSongTitle(songGroup, tableData, widthSong - 40, i); //places the scrolling song title
+                d3.select("#song" + songId + "inHeatmap").style("visibility", "hidden"); // hides the cropped static song titles
+                makeScrolingSongTitle(songGroup, heatmapData, widthSong - 40, i); //places the scrolling song title
             })
             .on("mouseleave", function () {
-                d3.select("#song" + currentHoveredSongId + "inTable").style("visibility", "visible");// shows the cropt static text
-                d3.select("#song" + currentHoveredSongId + "inTableScroll").remove();// removes the scrolling text
+                d3.select("#song" + currentHoveredSongId + "inHeatmap").style("visibility", "visible");// shows the cropt static text
+                d3.select("#song" + currentHoveredSongId + "inHeatmapScroll").remove();// removes the scrolling text
             });
             
 
@@ -429,58 +429,58 @@ function renderTableData(svgTable, tableData, attributes) {
             .attr("stroke", "black");
 
         songGroup.append("text") // append static title to first column
-            .attr("id", "song" + songId + "inTable")
+            .attr("id", "song" + songId + "inHeatmap")
             .attr("x", 45)
             .attr("y", heightElement + heightElement * i + heightElement / 4)
             .attr("dominant-baseline", "central")
-            .html(`<tspan class="card-title" dy="0">${cropText(svgTable, tableData[i][1], widthSong - 45)}</tspan><br><tspan class="card-text" x="45" dy="1.2em">${cropText(svgTable, tableData[i][2], widthSong - 45)}</tspan>`);
+            .html(`<tspan class="card-title" dy="0">${cropText(svgHeatmap, heatmapData[i][1], widthSong - 45)}</tspan><br><tspan class="card-text" x="45" dy="1.2em">${cropText(svgHeatmap, heatmapData[i][2], widthSong - 45)}</tspan>`);
 
         songGroup.append("rect") // adding the color box
             .attr("x", 0)
             .attr("y", heightElement + heightElement * i)
             .attr("width", 40)
             .attr("height", heightElement)
-            .attr("fill", tableData[i][11]);
+            .attr("fill", heatmapData[i][11]);
 
         for (let j = 0; j < attributes.length; j++) {
-            svgTable.append("rect")
+            svgHeatmap.append("rect")
                 .attr("id", attributes[j].id + " Row" + songId)
-                .classed("valuesInTable", true)
+                .classed("valuesInHeatmap", true)
                 .attr("x", widthSong + ((width - widthSong) / attributes.length) * j)
                 .attr("y", heightElement + heightElement * i)
                 .attr("width", ((width - widthSong) / attributes.length))
                 .attr("height", heightElement)
                 .attr("fill", "black")
                 .attr("stroke-width", 2)
-                .attr("fill-opacity", attributes[j].scale(tableData[i][attributes[j].arrayIndex]))
+                .attr("fill-opacity", attributes[j].scale(heatmapData[i][attributes[j].arrayIndex]))
                 .attr("stroke", "none")
                 .on("mouseover", function () {
-                    d3.select("#Row" + songId + "highlight").attr("stroke", tableData[i][11]).style("visibility", "visible");
+                    d3.select("#Row" + songId + "highlight").attr("stroke", heatmapData[i][11]).style("visibility", "visible");
                     d3.select("#" + attributes[j].id + "Row" + songId + "value").style("visibility", "visible");
                 })
                 .on("mouseout", function () {
                     d3.select("#Row" + songId + "highlight").style("visibility", "hidden"); // removes row highlighting
                     d3.select("#" + attributes[j].id + "Row" + songId + "value").style("visibility", "hidden");
                 });
-            svgTable.append("text")
+            svgHeatmap.append("text")
                 .attr("id", attributes[j].id + "Row" + songId + "value")
-                .classed("valuesInTable tableHeadline" + " values" + attributes[j].id, true)
+                .classed("valuesInHeatmap headmapHeadline" + " values" + attributes[j].id, true)
                 .style("text-anchor", "middle")
-                .text(tableData[i][attributes[j].arrayIndex])
+                .text(heatmapData[i][attributes[j].arrayIndex])
                 .attr("x", widthSong + ((width - widthSong) / attributes.length) * (j + 0.5))
                 .attr("y", heightElement + heightElement * (i + 0.5))
                 .attr("dominant-baseline", "central")
                 .style("visibility", "hidden")
                 .style("pointer-events", "none");
-            if (attributes[j].scale(tableData[i][attributes[j].arrayIndex]) < 0.5) {
+            if (attributes[j].scale(heatmapData[i][attributes[j].arrayIndex]) < 0.5) {
                 d3.select("#" + attributes[j].id + "Row" + songId + "value").attr("fill", "black");
             } else {
                 d3.select("#" + attributes[j].id + "Row" + songId + "value").attr("fill", "white");
             }
         }
-        svgTable.append("rect")// adding box for highlighting a row when on hover
+        svgHeatmap.append("rect")// adding box for highlighting a row when on hover
             .attr("id", "Row" + songId + "highlight")
-            .classed("valuesInTable", true)
+            .classed("valuesInHeatmap", true)
             .attr("x", 0)
             .attr("y", heightElement + (heightElement * i))
             .attr("width", width)
@@ -509,17 +509,17 @@ const tooltipAttributes = d3.select("body")
 
 
 // Width and height as the inner dimensions of the chart area
-const width = 700 - tableMargin.left - tableMargin.right;
-const height = 450 - tableMargin.top - tableMargin.bottom;
+const width = 700 - heatmapMargin.left - heatmapMargin.right;
+const height = 450 - heatmapMargin.top - heatmapMargin.bottom;
 
 const widthSong = 150
 const heightElement = height / 11
 const heightSortButton = 15
 
-const renderTable = () => {
+const renderHeatmap = () => {
     let sortedData = [];
     let data = selectedSongs
-    let tableData = prepDataTable(data);    
+    let heatmapData = prepDataHeatmap(data);    
    
     // Definition of the luminance scales which are then stored in "attributes" as "scale"
     let colorScaleDanceability = d3.scaleLinear()
@@ -597,8 +597,8 @@ const renderTable = () => {
     { id: "loudness", attribute: "Loudness", scale: colorScaleLoudness, arrayIndex: 10, description: "The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db." }]
 
    
-    let svgTable = renderTableOutline(tableData, data, attributes);
-    renderTableData (svgTable, tableData, attributes);
+    let svgHeatmap = renderHeatmapOutline(heatmapData, data, attributes);
+    renderHeatmapData (svgHeatmap, heatmapData, attributes);
     
 
 

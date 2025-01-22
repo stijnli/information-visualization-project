@@ -31,7 +31,7 @@ const setSelectedSongs = (newSelectedSongs) => {
     }
     updateRankChart();
     updateCountryDropdownMenu();
-    renderTable();
+    renderHeatmap();
 };
 
 let graphChart = undefined;
@@ -61,7 +61,7 @@ const setCurrentHoveredSongId = (newSongId) => {
         }
 
         d3.select("#Row" + currentHoveredSongId + "highlight").style("visibility", "hidden"); // removes row higlighting
-        d3.select("#song" + currentHoveredSongId + "inTableScroll").remove();// removes the scrolling text
+        d3.select("#song" + currentHoveredSongId + "inHeatmapScroll").remove();// removes the scrolling text
         
     }
     currentHoveredSongId = newSongId    
@@ -91,7 +91,7 @@ const setCurrentHoveredSongId = (newSongId) => {
         graphNode.style.stroke = "black"
 
         
-        // highlight the song in the attribute table
+        // highlight the song in the attribute heatmap
         d3.select("#Row" + newSongId + "highlight").attr("stroke",selectedSong.color ).attr("stroke-width", 4).style("visibility", "visible");// change for row outline highlight
 
 
