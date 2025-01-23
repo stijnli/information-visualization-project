@@ -68,7 +68,7 @@
 			</div>
 			<div class="col-md-3"></div>
 			<div class="col-md-9">
-				<div class="row" style="height: 500px;">
+				<div class="row" style="height: 480;">
 					<div class="col-12">
 						<p>
 							Below, you can see a graph chart that allows you to explore the relationship between
@@ -78,13 +78,13 @@
 						<div id="graphChart" style="height: 400px; width: 100%;"></div>
 					</div>
 				</div>
-				<div class="row" style="height: 450px;">
+				<div class="row" style="height: 470px;">
 					<div class="col-6" id="rankChartCol">
-						<p>
+						<p id="rankChartP">
 							In the rank chart, you can see the ranking in the top 50, globally or in a specific country.
 							You can use the dropdown to select a country.
 						</p>
-						<select style="float:right;" id="countrySelect" onchange="selectCountry(this.value)"></select>
+						<select id="countrySelect" onchange="selectCountry(this.value)"></select>
 						<div id="rank_chart"></div>
 					</div>
 					<div class="col-6" id="heatmapCol">

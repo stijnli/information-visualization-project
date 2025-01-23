@@ -20,3 +20,18 @@ body{
     font-size: 16px;
     text-anchor: middle;
   }
+
+#countrySelect {
+    float:right;
+    margin-top:-1.5rem;
+}
+
+#rankChartCol {
+    height:100%;
+    width:100%;
+}
+
+#rank_chart {
+    height:100%;
+    width:100%;
+}

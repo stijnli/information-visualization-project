@@ -31,8 +31,8 @@ const noDataMessage = 'No Ranking data found for selected songs. Select differen
 
 // set the dimensions and margins of the graph
 const chartMargin = { top: 10, right: 30, bottom: 70, left: 60 };
-const chartWidth = 550 - chartMargin.left - chartMargin.right;
-const chartHeight = 450 - chartMargin.top - chartMargin.bottom;
+let chartWidth;
+let chartHeight;
 
 function setMeasurements(data) {
     measurements = data;
@@ -124,12 +124,20 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
 }
 
 function initRankChart() {
+    let parentDiv = document.getElementById("rank_chart");
+    let parHeight = document.getElementById("rankChartP").clientHeight;
+    let parentWidth = parentDiv.clientWidth;
+    let parentHeight = parentDiv.clientHeight - parHeight;
+    
+    chartWidth = parentWidth - chartMargin.left - chartMargin.right;
+    chartHeight = parentHeight - chartMargin.top - chartMargin.bottom;
+
     // append the svg object to the body of the page
     svg = d3
         .select("#rank_chart")
         .append("svg")
-        .attr("width", chartWidth + chartMargin.left + chartMargin.right)
-        .attr("height", chartHeight + chartMargin.top + chartMargin.bottom)
+        .attr("width", parentWidth)
+        .attr("height", parentHeight)
         .attr("id", "rankChartSVG");
 
     g = svg.append("g")
@@ -301,6 +309,7 @@ function updateRankChart() {
         .attr('class', 'alert alert-warning')
         .attr('id', 'rankChartNoDataAlert')
         .attr('role', 'alert')
+        .style('margin-bottom', '2.5rem')
         .text(noDataMessage);
         return;
     }
@@ -353,7 +362,7 @@ function updateRankChart() {
         .attr("class", "pathLine")
         .attr("stroke", (d) => getSongColor(d[0]))
         .attr("stroke-width", 3)
-        .attr("opacity", 0.6)
+        .attr("opacity", 1)
         .attr("border", 0)
         .attr("id", (d) => `rankchart-${d[0]}`)
         .attr("d", (d) =>
