@@ -11,6 +11,12 @@ const colorQueue = [...config.songColors];
 
 let selectedSongs = [];
 const setSelectedSongs = (newSelectedSongs) => {
+    // Make sure that is not possible for newSelectedSongs to contain more items than the maxSelectedSongs config variable
+    if (newSelectedSongs.length > config.maxSelectedSongs) {
+        newSelectedSongs = newSelectedSongs.slice(0, config.maxSelectedSongs);
+    }
+
+
     // Check which songs have been removed and add their colors back to the queue
     const removedSongs = selectedSongs.filter(song => !newSelectedSongs.some(newSong => newSong.id === song.id));
     removedSongs.forEach(song => colorQueue.push(song.color));
@@ -20,6 +26,9 @@ const setSelectedSongs = (newSelectedSongs) => {
     addedSongs.forEach(song => {
         song.color = colorQueue.pop();
     });
+    if (addedSongs.length == 0 && removedSongs.length == 0) {
+        return;
+    }
 
 
     selectedSongs = newSelectedSongs;
