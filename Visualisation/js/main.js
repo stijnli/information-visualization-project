@@ -1,6 +1,6 @@
 // Define config variables
 const config = {
-    songColors: ["#00B7FF", "#004DFF", "#00FFFF", "#826400", "#580041", "#FF00FF", "#C500FF", "#FFCA00", "#969600", "#B4A2FF", "#C20078", "#0000C1", "#FF8B00", "#FF0000", "#009E8F", "#D7A870", "#8200FF", "#960000", "#BBFF00", "#FFFF00", "#006F00"],
+    songColors: ['#a6cee3','#b2df8a','#fb9a99','#fdbf6f','#cab2d6','#33a02c','#1f78b4','#e31a1c','#ff7f00','#6a3d9a'],
     maxSelectedSongs: 10
 }
 
