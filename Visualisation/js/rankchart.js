@@ -115,6 +115,15 @@ function wrangleMeasurements(groupedSelectedMeasurements) {
             previousEntry = measurement;
         }
 
+        newEntries.push({
+            spotify_id: previousEntry.spotify_id,
+            snapshot_date: new Date(
+                previousEntry.snapshot_date.getTime() + oneDay
+            ),
+            daily_rank: 52,
+            country: previousEntry.country,
+        });
+
         // add the new data points and sort everything on date again
         songMeasurements[1].push(...newEntries);
         songMeasurements[1].sort(function (a, b) {
