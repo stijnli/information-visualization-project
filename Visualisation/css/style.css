@@ -4,6 +4,10 @@ body{
     padding: 0;
 }
 
+.knowledgeGraphRow {
+    padding-top: 20px;
+}
+
 .headmapHeadline{
     font-size: 12px
 }
