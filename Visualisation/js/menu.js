@@ -52,7 +52,7 @@ const renderMusicSelection = () => {
                         <button type="button" class="btn btn-danger" data-toggle="modal" 
                         onclick="removeSong('${d.id}')" data-target="#exampleModal"
                         >
-                        -
+                        <b>-</b>
                         </button>
                 </div>
             `;
@@ -133,7 +133,7 @@ const renderSearchResults = () => {
                         <button type="button" class="btn btn-success" data-toggle="modal"
                         onclick="addSong('${d.id}'); setCurrentSearchTerm('');" data-target="#exampleModal"
                         >
-                        +
+                        <b>+</b>
                         </button>
                 </div>
             `;
