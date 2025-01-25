@@ -454,11 +454,12 @@ function renderHeatmapData(svgHeatmap, heatmapData, attributes) {
                 .attr("stroke-width", 2)
                 .attr("fill-opacity", attributes[j].scale(heatmapData[i][attributes[j].arrayIndex]))
                 .attr("stroke", "none")
-                .on("mouseover", function () {
+                .on("mouseenter", function () {
+                    setCurrentHoveredSongId(songId);
                     d3.select("#Row" + songId + "highlight").attr("stroke", heatmapData[i][11]).style("visibility", "visible");
                     d3.select("#" + attributes[j].id + "Row" + songId + "value").style("visibility", "visible");
                 })
-                .on("mouseout", function () {
+                .on("mouseleave", function () {
                     d3.select("#Row" + songId + "highlight").style("visibility", "hidden"); // removes row highlighting
                     d3.select("#" + attributes[j].id + "Row" + songId + "value").style("visibility", "hidden");
                 });
