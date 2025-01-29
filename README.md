@@ -26,7 +26,7 @@ SpotiVis provides a visualisation showing a full year of Spotify top 50 charts f
 ```bash
 docker compose up --build
 ```
-4. Visit `http://localhost:8080/main.html`, please use Chrome as there was noted 
+4. Visit `http://localhost:8080/main.html`, please use Chrome as there are some issues with other browser 
 5. Loading in all the data should take around 5 seconds. After that, the visualisation should be all functional!
 
 Alternatively, the visualization can be accessed at [this link](https://koschoemaker.nl/INFOMVIS/Visualisation/main.html), although loading might take longer because the data has to be transferred over the web.
