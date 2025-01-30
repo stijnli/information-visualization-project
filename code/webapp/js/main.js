@@ -219,7 +219,7 @@ const initializeLoad = () => {
             daily_rank: d.daily_rank,
             country: d.country,
         };
-    })
+        })
         .then((data) => {
             setMeasurements(data);
             setIntialSongSelection();
@@ -227,7 +227,10 @@ const initializeLoad = () => {
             return fetch("data/alpha2ToCountryName.json");
         })
         .then((response) => response.json())
-        .then((alpha2ToCountryCode) => initCountryOptions(alpha2ToCountryCode));
+        .then((alpha2ToCountryCode) => {
+            initCountryOptions(alpha2ToCountryCode); 
+            updateCountryDropdownMenu();
+        });
 
     function setIntialSongSelection() {
         if (selectedSongs.length > 0) {
