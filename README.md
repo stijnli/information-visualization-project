@@ -4,6 +4,10 @@ By Stijn Lievaart, Veit Schneider & Ko Schoemaker for INFOMVIS UU 2025
 ---
 SpotiVis provides a visualisation showing a full year of Spotify top 50 charts from 73 different countries. It can give insight into relations between songs, their artists albums and genres. Besides that, you can explore song rankings over for the past year for 73 different countries in the rank chart or investigate the intrinsic selected song features like Dancability or Valence in the feature matrix.
 
+---
+
+[A video introduction to this project can be found here.](https://youtu.be/MuHuBBpk1ZU)
+
 ## File Overview
 - `\code\data_understanding\main.ipnb`: A Python notebook containing the code for collecting and wrangling the source data
 - `\code\data_understanding\cache`: A cache directory used by the Python notebook so that we do not continously fetch the songs (which is not good for API timeouts.
